@@ -507,12 +507,6 @@ onMounted(async () => {
   </main>
 </template>
 
-<style>
-:root {
-  --header-height: 68px;
-}
-</style>
-
 <style scoped>
 .main {
   height: calc(100vh - var(--header-height));
