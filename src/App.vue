@@ -248,9 +248,9 @@ onMounted(async () => {
     </header>
 
     <div class="grid grid-rows-1 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 overflow-x-hidden">
-      <!-- 1 select contacts - groups -->
+      <!-- 1  contacts - groups -->
       <section
-        class="border-r-gray-200 border-r-1 bg-white py-sm px-lg flex flex-col gap-y-2xl z-3 transition-transform duration-300 row-[1/-1]"
+        class="border-r-gray-200 border-r-1 bg-white py-sm px-xl flex flex-col gap-y-2xl z-3 transition-transform duration-300 row-[1/-1]"
         :class="classNameSectionGroups[step]"
       >
         <div class="flex items-center">
@@ -319,9 +319,9 @@ onMounted(async () => {
         </div>
       </section>
 
-      <!-- 2 select resources groups -->
+      <!-- 2 users -->
       <section
-        class="border-r-gray-200 border-r-1 bg-white py-sm px-lg flex-col gap-y-2xl flex z-2 transition-transform duration-300 row-[1/-1]"
+        class="border-r-gray-200 border-r-1 bg-white py-sm px-xl flex-col gap-y-2xl flex z-2 transition-transform duration-300 row-[1/-1]"
         :class="classNameSectionUsers[step]"
       >
         <div class="flex items-center">
@@ -333,7 +333,7 @@ onMounted(async () => {
           </p>
         </div>
 
-        <!-- resume -->
+        <!-- review -->
         <div
           class="flex justify-between items-center py-1 font-extralight text-xs border-t-1 border-t-gray-200 border-b-1 border-b-gray-200"
         >
@@ -366,7 +366,7 @@ onMounted(async () => {
             </button>
           </div>
         </div>
-
+        <!-- 
         <MultiSelectFiltered
           ref="selectResourceGroupRef"
           name="resource-group"
@@ -374,7 +374,7 @@ onMounted(async () => {
           @select="onSelectResource"
         />
 
-        <div class="w-full h-[1px] bg-gray-200"></div>
+        <div class="w-full h-[1px] bg-gray-200"></div> -->
 
         <!-- cards group -->
         <div class="overflow-auto scroller">
@@ -396,7 +396,7 @@ onMounted(async () => {
 
       <!-- 3 resume and remove resources -->
       <section
-        class="bg-white py-sm px-lg flex-col gap-y-2xl flex z-1 transition-transform duration-300 row-[1/-1]"
+        class="bg-white py-sm px-xl flex-col gap-y-2xl flex z-1 transition-transform duration-300 row-[1/-1]"
         :class="classNameSectionResources[step]"
       >
         <div class="flex items-center">

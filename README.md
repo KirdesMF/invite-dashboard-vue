@@ -14,3 +14,41 @@ Since TypeScript cannot handle type information for `.vue` imports, they are shi
 2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
 
 You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+
+## Todo
+
+- loading state
+- error state
+- add illustration empty state
+- empty group toaster
+  - random user created from 0
+- remove resource
+- routes
+- free and pro
+- first step simple design
+- remove one of select resources
+- refactor
+- fix issue display resources
+  => select user resource
+  => select group
+  => both resources are displayed
+- hide button back step when needed
+- improve design back button
+- add number of licenses
+- design footer and headers
+- max width cards
+- disabled already selected resources in selects
+- find icons models and campaigns
+  - add to list in select
+  - add to button select
+  - add to review resources
+- fake post request
+- modal success
+- modal leave page
+- fix issue select all on mobile
+- add design to list users when select all
+- add design to cards when selected
+- add design to cards when selected
+  - remove chevron right ?
+- add color circle or user avatar in resource panel when selected
+- home page add description design
