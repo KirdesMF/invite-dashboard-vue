@@ -15,8 +15,17 @@ Since TypeScript cannot handle type information for `.vue` imports, they are shi
 
 You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
 
+## Demo
+
+Live vercel demo: [here](https://invite-dashboard-vue.vercel.app/)
+
+In this demo, there is no search or infinite scroll inside selects. The point is to demonstrate the functionality second step of the invite manager.
+
+[faker.js](https://fakerjs.dev/) is used to generate random data.
+
 ## Todo
 
+- disable others panels if no users or groups are selected => filter grayscale + pointer-events: none
 - loading state
 - error state
 - add illustration empty state
@@ -35,6 +44,7 @@ You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/
 - hide button back step when needed
 - improve design back button
 - add number of licenses
+- add number of managers selected from step one
 - design footer and headers
 - max width cards
 - disabled already selected resources in selects
@@ -52,3 +62,12 @@ You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/
   - remove chevron right ?
 - add color circle or user avatar in resource panel when selected
 - home page add description design
+- reset campaigns
+- reset models
+- scroll top panel
+- scroll to selected user or group
+
+## Improvements
+
+- select some users
+- warn user when a selected user is in multiple groups

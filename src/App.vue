@@ -145,6 +145,7 @@ function isUserSelected(userId: string) {
 function onClickCardGroup(groupId: string) {
   isSelectedAll.value = true;
   currentGroupId.value = groupId;
+  currentUserId.value = "";
   setStep("users");
 }
 
@@ -325,7 +326,7 @@ onMounted(async () => {
         :class="classNameSectionUsers[step]"
       >
         <div class="flex items-center">
-          <button type="button" class="w-5 h-5 text-blue" @click="setStep('groups')">
+          <button type="button" class="w-5 h-5 text-blue lg:hidden" @click="setStep('groups')">
             <ChevronDoubleLeftIcon />
           </button>
           <p class="font-thin text-sm text-gray-500 max-w-[35ch] mx-auto text-center">
@@ -400,7 +401,7 @@ onMounted(async () => {
         :class="classNameSectionResources[step]"
       >
         <div class="flex items-center">
-          <button type="button" class="w-5 h-5 text-blue" @click="setStep('users')">
+          <button type="button" class="w-5 h-5 text-blue lg:hidden" @click="setStep('users')">
             <ChevronDoubleLeftIcon />
           </button>
           <p class="font-thin text-sm text-gray-500 max-w-[35ch] mx-auto text-center">Remove or clear resources</p>
