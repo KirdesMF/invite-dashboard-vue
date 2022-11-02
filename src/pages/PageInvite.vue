@@ -336,7 +336,7 @@ onMounted(async () => {
               <CardGroup
                 :group="group"
                 :contacts-id="selectedGroupsStore.groupContactsId"
-                :class="{ 'bg-pink-50': isGroupSelected(group.uuid) }"
+                :class="{ 'bg-gray-200': isGroupSelected(group.uuid) }"
                 @click="onClickCardGroup(group.uuid)"
                 @delete="selectedGroupsStore.removeGroup(group.uuid)"
               />
@@ -351,11 +351,16 @@ onMounted(async () => {
         :class="classNameSectionUsers[step]"
       >
         <div class="flex items-center">
-          <button type="button" class="w-5 h-5 text-blue lg:hidden" @click="setStep('groups')">
+          <button
+            v-if="step === 'resources' || step === 'users'"
+            type="button"
+            class="w-5 h-5 text-blue lg:hidden"
+            @click="setStep('groups')"
+          >
             <ChevronDoubleLeftIcon />
           </button>
           <p class="font-thin text-sm text-gray-500 max-w-[35ch] mx-auto text-center">
-            Select resources for the selected group
+            Select a contact or all contacts
           </p>
         </div>
 
@@ -410,8 +415,7 @@ onMounted(async () => {
                 :user="selectedUsersStore.getUser(userId)!"
                 :resources-count="selectedUsersStore.getCountUserResources(userId) || 0"
                 :class="{
-                  'bg-pink-50': isUserSelected(userId),
-                  'hover:bg-pink-50': isUserSelected(userId),
+                  'bg-gray-200': isUserSelected(userId) || isSelectedAll,
                 }"
                 @click="onClickCardUser(userId)"
                 @delete="selectedGroupsStore.removeUserFromGroup(userId, currentGroupId)"
@@ -427,7 +431,7 @@ onMounted(async () => {
         :class="classNameSectionResources[step]"
       >
         <div class="flex items-center">
-          <button type="button" class="w-5 h-5 text-blue lg:hidden" @click="setStep('users')">
+          <button type="button" class="w-5 h-5 text-blue md:hidden" @click="setStep('users')">
             <ChevronDoubleLeftIcon />
           </button>
           <p class="font-thin text-sm text-gray-500 max-w-[35ch] mx-auto text-center">Remove or clear resources</p>

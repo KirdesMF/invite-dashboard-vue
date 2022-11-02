@@ -25,6 +25,9 @@ In this demo, there is no search or infinite scroll inside selects. The point is
 
 ## Todo
 
+- Add search to selected users
+- virtualize user list or create pagination ?
+- local storage free or pro
 - disable others panels if no users or groups are selected => filter grayscale + pointer-events: none
 - loading state
 - error state

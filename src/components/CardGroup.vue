@@ -27,7 +27,7 @@ defineEmits<Emits>();
 <template>
   <article
     tabindex="0"
-    class="flex justify-between items-center shadow-sm border-1 border-gray-2 px-sm py-sm rounded-sm hover:bg-gray-50"
+    class="flex justify-between items-center shadow-sm border-1 border-gray-2 px-sm py-sm rounded-sm hover:bg-gray-100"
     @click="$emit('click')"
     @keypress.enter="$emit('click')"
   >

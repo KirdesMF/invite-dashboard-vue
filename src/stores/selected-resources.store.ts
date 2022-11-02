@@ -94,7 +94,6 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
    */
   function removeAllResourcesGroup(groupId: string) {
     const group = selectedGroupStore.getGroup(groupId)!;
-    console.log(group.resources);
 
     // remove resources group from users
     group.users.forEach((user) => {
