@@ -124,6 +124,14 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
     if (group.users.length === 0) removeGroup(groupId);
   }
 
+  /**
+   * remove all groups and users
+   */
+  function removeAllGroups() {
+    groups.value = [];
+    usersStore.removeAllUsers();
+  }
+
   return {
     groupContactsId,
     getSelectedGroups,
@@ -134,6 +142,7 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
     addGroup,
     removeGroup,
     removeUserFromGroup,
+    removeAllGroups,
     isSelectedGroup,
     isUserFromGroupContact,
   };

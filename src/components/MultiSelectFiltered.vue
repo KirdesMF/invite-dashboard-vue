@@ -88,6 +88,7 @@ defineExpose({ current });
       :options="currentOptions?.options"
       :placeholder="currentOptions?.placeholder"
       :can-clear="false"
+      :close-on-select="false"
       @select="onSelect"
       :classes="{
         singleLabelText: 'font-thin text-3 capitalize truncate',

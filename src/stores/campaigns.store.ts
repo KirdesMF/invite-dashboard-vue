@@ -17,7 +17,7 @@ export const useCampaignsStore = defineStore("campaigns", () => {
   async function setCampaigns() {
     try {
       isLoading.value = true;
-      campaigns.value = await createCampaigns(20);
+      campaigns.value = await createCampaigns(50);
     } catch (error) {
       hasError.value = true;
     } finally {

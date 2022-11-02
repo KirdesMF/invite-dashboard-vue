@@ -31,7 +31,7 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
    */
   function addResourceUser(resource: Campaign | Model, userId: string) {
     const user = selectedUserStore.getUser(userId);
-    const hasResource = user?.resources.some((r) => r.uuid === resource.uuid && r.type === resource.type);
+    const hasResource = user?.resources.some((r) => r.uuid === resource.uuid);
 
     if (!hasResource) user?.resources.push(resource);
   }
@@ -58,7 +58,7 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
    */
   function removeResourceUser(resource: Campaign | Model, userId: string) {
     const user = selectedUserStore.getUser(userId)!;
-    user.resources = user?.resources.filter((r) => r.uuid !== resource.uuid && r.type !== resource.type);
+    user.resources = user?.resources.filter((r) => r.uuid !== resource.uuid);
   }
 
   /**
@@ -79,7 +79,7 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
     const group = selectedGroupStore.getGroup(groupId)!;
 
     // remove resource from group
-    group.resources = group?.resources.filter((r) => r.uuid !== resource.uuid && r.type !== resource.type);
+    group.resources = group.resources.filter((r) => r.uuid !== resource.uuid);
 
     // remove resource group from users
     group.users.forEach((user) => {
@@ -94,14 +94,12 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
    */
   function removeAllResourcesGroup(groupId: string) {
     const group = selectedGroupStore.getGroup(groupId)!;
+    console.log(group.resources);
 
     // remove resources group from users
     group.users.forEach((user) => {
       const current = selectedUserStore.getUser(user)!;
-
-      current.resources = current.resources.filter((resource) =>
-        group.resources.some((r) => r.uuid !== resource.uuid && r.type !== resource.type)
-      );
+      group.resources.forEach((resource) => removeResourceUser(resource, current.uuid));
     });
 
     // remove resources from group

@@ -185,8 +185,6 @@ function onSelectUsers(option: Group | User) {
   currentUserId.value = "";
 
   isSelectedAll.value = true;
-
-  console.log(currentGroupId.value);
 }
 
 /**
@@ -197,6 +195,15 @@ function onSelectResource(option: Campaign | Model) {
   isSelectedAll.value
     ? selectedResourcesStore.addResourceGroup(option, currentGroupId.value)
     : selectedResourcesStore.addResourceUser(option, currentUserId.value);
+}
+
+/**
+ * remove all resources group or user
+ */
+function onClearAllResources() {
+  isSelectedAll.value
+    ? selectedResourcesStore.removeAllResourcesGroup(currentGroupId.value)
+    : selectedResourcesStore.removeAllResourcesUser(currentUserId.value);
 }
 
 const classNameSectionGroups = {
@@ -297,7 +304,11 @@ onMounted(async () => {
             </p>
           </div>
 
-          <button type="button" class="flex text-2.5 text-blue hover:text-blue-600">
+          <button
+            type="button"
+            class="flex text-2.5 text-blue hover:text-blue-600"
+            @click="selectedGroupsStore.removeAllGroups"
+          >
             <span>Clear</span>
             <span>
               <XMark class="w-3 h-3" />
@@ -437,7 +448,7 @@ onMounted(async () => {
           </div>
 
           <div class="flex gap-x-2 items-center">
-            <button type="button" class="flex text-2.5 text-blue hover:text-blue-600">
+            <button type="button" class="flex text-2.5 text-blue hover:text-blue-600" @click="onClearAllResources">
               <span>Clear</span>
               <span>
                 <XMark />
@@ -461,7 +472,10 @@ onMounted(async () => {
               </h2>
               <ul class="flex flex-wrap gap-xs">
                 <li v-for="resource in resourcesCampaignCurrentGroup" :key="resource.uuid">
-                  <ButtonTag :resource="resource" />
+                  <ButtonTag
+                    :resource="resource"
+                    @click="selectedResourcesStore.removeResourceGroup(resource, currentGroupId)"
+                  />
                 </li>
               </ul>
             </div>
@@ -475,7 +489,10 @@ onMounted(async () => {
               </h2>
               <ul class="flex flex-wrap gap-xs">
                 <li v-for="resource in resourcesModelCurrentGroup" :key="resource.uuid">
-                  <ButtonTag :resource="resource" />
+                  <ButtonTag
+                    :resource="resource"
+                    @click="selectedResourcesStore.removeResourceGroup(resource, currentGroupId)"
+                  />
                 </li>
               </ul>
             </div>
@@ -491,7 +508,10 @@ onMounted(async () => {
 
               <ul class="flex flex-wrap gap-xs">
                 <li v-for="resource in resourcesCampaignCurrentUser" :key="resource.uuid">
-                  <ButtonTag :resource="resource" />
+                  <ButtonTag
+                    :resource="resource"
+                    @click="selectedResourcesStore.removeResourceUser(resource, currentUserId)"
+                  />
                 </li>
               </ul>
             </div>
@@ -506,7 +526,10 @@ onMounted(async () => {
 
               <ul class="flex flex-wrap gap-xs">
                 <li v-for="resource in resourcesModelCurrentUser" :key="resource.uuid">
-                  <ButtonTag :resource="resource" />
+                  <ButtonTag
+                    :resource="resource"
+                    @click="selectedResourcesStore.removeResourceUser(resource, currentUserId)"
+                  />
                 </li>
               </ul>
             </div>

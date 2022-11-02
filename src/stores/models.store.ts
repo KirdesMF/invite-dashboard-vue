@@ -17,7 +17,7 @@ export const useModelsStore = defineStore("models", () => {
   async function setModels() {
     try {
       isLoading.value = true;
-      models.value = await createModels(20);
+      models.value = await createModels(50);
     } catch (error) {
       hasError.value = true;
     } finally {

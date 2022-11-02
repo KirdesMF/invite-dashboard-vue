@@ -54,11 +54,16 @@ export const useSelectedUsersStore = defineStore("selected-user", () => {
    */
   function removeUser(userId: string, groupId: string) {
     const user = getUser(userId)!;
+
     user.groups = user.groups.filter((group) => group !== groupId);
     if (user.groups.length === 0) users.value = users.value.filter((user) => user.uuid !== userId);
   }
 
-  return { getSelectedUsers, getCountUserResources, getUser, addUser, removeUser };
+  function removeAllUsers() {
+    users.value = [];
+  }
+
+  return { getSelectedUsers, getCountUserResources, getUser, addUser, removeUser, removeAllUsers };
 });
 
 if (import.meta.hot) {
