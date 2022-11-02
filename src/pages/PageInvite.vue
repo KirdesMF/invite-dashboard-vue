@@ -28,6 +28,7 @@ import ButtonTag from "../components/ButtonTag.vue";
 import SelectAllIcon from "../components/icons/SelectAllIcon.vue";
 import GroupColor from "../components/GroupColor.vue";
 import ChevronDoubleLeftIcon from "../components/icons/ChevronDoubleLeftIcon.vue";
+import { useAuthStore } from "../stores/auth.store";
 
 type Step = "groups" | "users" | "resources";
 
@@ -46,6 +47,7 @@ const selectUserRef = ref<InstanceType<typeof MultiSelectFiltered> | null>(null)
 const selectResourceGroupRef = ref<InstanceType<typeof MultiSelectFiltered> | null>(null);
 
 // stores
+const authStore = useAuthStore();
 const groupsStore = useGroupsStore();
 const usersStore = useUsersStore();
 const campaignStore = useCampaignsStore();
@@ -56,6 +58,8 @@ const selectedResourcesStore = useSelectedResourcesStore();
 
 // computed
 const accessUpToDate = computed(() => setAccessUpToDate(30));
+const countLicenses = computed(() => authStore.countLicenses);
+const isPro = computed(() => authStore.isPro);
 
 const groups = computed(() => groupsStore.getGroups);
 const users = computed(() => usersStore.getUsers);
@@ -224,7 +228,7 @@ onMounted(async () => {
 
 <template>
   <main class="main">
-    <header class="header flex justify-between py-xs px-lg border-b-light border-b-1">
+    <header class="header flex justify-between py-xs px-xl border-b-light border-b-1">
       <div class="flex items-center gap-x-4">
         <h1 class="font-600 text-lg">Invite managers</h1>
 
@@ -240,6 +244,12 @@ onMounted(async () => {
       </div>
 
       <div class="hidden md:flex gap-x-sm items-center">
+        <p class="font-200 text-sm">
+          <span class="text-green font-400">{{ countLicenses }}</span> licenses left
+        </p>
+
+        <div class="h-full w-[1px] bg-gray-300"></div>
+
         <p class="font-300 text-sm text-gray-500">
           Access up to <span class="font-500 text-blue-600">{{ accessUpToDate }}</span>
         </p>
