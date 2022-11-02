@@ -72,14 +72,15 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
    * @param user
    */
   function addUserToGroupContact(user: User) {
-    const group = getGroup(groupContactsId);
+    const group = getGroup(groupContactsId)!;
 
-    // add user to group
-    if (!group) groups.value.push({ ...groupContacts, users: [user.uuid] });
-    else group?.users.push(user.uuid);
-
-    // add user to selected users and resources from group
-    usersStore.addUser(user, group?.resources);
+    if (!group) {
+      groups.value.push({ ...groupContacts, users: [user.uuid] });
+      usersStore.addUser(user, groupContactsId, []);
+    } else {
+      group.users.push(user.uuid);
+      usersStore.addUser(user, groupContactsId, group.resources);
+    }
   }
 
   /**
@@ -92,10 +93,35 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
     const users = await createUsers(numberOfUsers);
 
     // add users to selected users
-    users.forEach((user) => usersStore.addUser(user));
+    users.forEach((user) => usersStore.addUser(user, group.uuid));
 
     // add group to selected groups
     groups.value.push({ ...group, users: users.map((user) => user.uuid), resources: [] });
+  }
+
+  /**
+   *
+   * @param groupId
+   */
+  function removeGroup(groupId: string) {
+    const group = getGroup(groupId)!;
+
+    group.users.forEach((userId) => usersStore.removeUser(userId, groupId));
+    groups.value = groups.value.filter((group) => group.uuid !== groupId);
+  }
+
+  /**
+   *
+   * @param groupId
+   * @param userId
+   */
+  function removeUserFromGroup(userId: string, groupId: string) {
+    const group = getGroup(groupId)!;
+
+    usersStore.removeUser(userId, groupId);
+    group.users = group.users.filter((user) => user !== userId);
+
+    if (group.users.length === 0) removeGroup(groupId);
   }
 
   return {
@@ -106,6 +132,8 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
     getCountGroupResources,
     addUserToGroupContact,
     addGroup,
+    removeGroup,
+    removeUserFromGroup,
     isSelectedGroup,
     isUserFromGroupContact,
   };

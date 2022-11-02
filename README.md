@@ -66,6 +66,13 @@ In this demo, there is no search or infinite scroll inside selects. The point is
 - reset models
 - scroll top panel
 - scroll to selected user or group
+- panel resources
+  - show global and individual resources selected
+  - add design to cards when selected
+  - add color circle or user avatar in resource panel when selected
+- clear all resources from group
+  - clear everything even user resources ?
+  - clear only group resources and keep user resources ?
 
 ## Improvements
 

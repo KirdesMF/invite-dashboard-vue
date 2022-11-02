@@ -14,6 +14,7 @@ type Props = {
 
 type Emits = {
   (event: "click"): void;
+  (event: "delete"): void;
 };
 
 // props
@@ -48,7 +49,7 @@ defineEmits<Emits>();
         </span>
         <p class="font-thin text-2.5">{{ group.users.length }}</p>
       </div>
-      <button type="button" class="hover:scale-110 hover:text-red transition duration-250">
+      <button type="button" class="hover:scale-110 hover:text-red transition duration-250" @click="$emit('delete')">
         <Trash />
       </button>
       <span>

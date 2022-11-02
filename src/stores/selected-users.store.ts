@@ -5,6 +5,7 @@ import type { Resource } from "./selected-resources.store";
 
 export type SelectedUser = User & {
   resources: Array<Resource>;
+  groups: Array<string>;
 };
 
 export const useSelectedUsersStore = defineStore("selected-user", () => {
@@ -42,12 +43,22 @@ export const useSelectedUsersStore = defineStore("selected-user", () => {
    * add user to selected users
    * @param user
    */
-  function addUser(user: User, resources?: Array<Resource>) {
+  function addUser(user: User, groupId: string, resources?: Array<Resource>) {
     const isSelected = isSelectedUser(user.uuid);
-    if (!isSelected) users.value.push({ ...user, resources: resources || [] });
+    if (!isSelected) users.value.push({ ...user, groups: [groupId], resources: resources || [] });
   }
 
-  return { getSelectedUsers, getCountUserResources, addUser, getUser };
+  /**
+   *
+   * @param userId
+   */
+  function removeUser(userId: string, groupId: string) {
+    const user = getUser(userId)!;
+    user.groups = user.groups.filter((group) => group !== groupId);
+    if (user.groups.length === 0) users.value = users.value.filter((user) => user.uuid !== userId);
+  }
+
+  return { getSelectedUsers, getCountUserResources, getUser, addUser, removeUser };
 });
 
 if (import.meta.hot) {

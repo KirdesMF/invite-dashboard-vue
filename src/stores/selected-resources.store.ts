@@ -16,30 +16,6 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
   const selectedGroupStore = useSelectedGroupsStore();
   const selectedUserStore = useSelectedUsersStore();
 
-  // states
-  const resources = ref<Array<Resource>>([]);
-
-  const getSelectedResources = computed(() => resources.value);
-
-  /**
-   *
-   * @param resourceId
-   * @returns resource
-   */
-  function getResource(resourceId: string) {
-    return resources.value.find((resource) => resource.uuid === resourceId);
-  }
-
-  /**
-   *
-   * @param resourceId
-   * @param type
-   * @returns
-   */
-  function getResourceByType(resourceId: string, type: "campaign" | "model") {
-    return resources.value.find((resource) => resource.uuid === resourceId && resource.type === type);
-  }
-
   /**
    * @param resources
    * @param type
@@ -56,10 +32,8 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
   function addResourceUser(resource: Campaign | Model, userId: string) {
     const user = selectedUserStore.getUser(userId);
     const hasResource = user?.resources.some((r) => r.uuid === resource.uuid && r.type === resource.type);
-    const isSelectedResource = resources.value.some((r) => r.uuid === resource.uuid && r.type === resource.type);
 
     if (!hasResource) user?.resources.push(resource);
-    if (!isSelectedResource) resources.value.push(resource);
   }
 
   /**
@@ -77,13 +51,71 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
     });
   }
 
+  /**
+   *
+   * @param resource
+   * @param userId
+   */
+  function removeResourceUser(resource: Campaign | Model, userId: string) {
+    const user = selectedUserStore.getUser(userId)!;
+    user.resources = user?.resources.filter((r) => r.uuid !== resource.uuid && r.type !== resource.type);
+  }
+
+  /**
+   *
+   * @param userId
+   */
+  function removeAllResourcesUser(userId: string) {
+    const user = selectedUserStore.getUser(userId)!;
+    user.resources = [];
+  }
+
+  /**
+   *
+   * @param resource
+   * @param groupId
+   */
+  function removeResourceGroup(resource: Campaign | Model, groupId: string) {
+    const group = selectedGroupStore.getGroup(groupId)!;
+
+    // remove resource from group
+    group.resources = group?.resources.filter((r) => r.uuid !== resource.uuid && r.type !== resource.type);
+
+    // remove resource group from users
+    group.users.forEach((user) => {
+      const current = selectedUserStore.getUser(user)!;
+      removeResourceUser(resource, current.uuid);
+    });
+  }
+
+  /**
+   *
+   * @param groupId
+   */
+  function removeAllResourcesGroup(groupId: string) {
+    const group = selectedGroupStore.getGroup(groupId)!;
+
+    // remove resources group from users
+    group.users.forEach((user) => {
+      const current = selectedUserStore.getUser(user)!;
+
+      current.resources = current.resources.filter((resource) =>
+        group.resources.some((r) => r.uuid !== resource.uuid && r.type !== resource.type)
+      );
+    });
+
+    // remove resources from group
+    group.resources = [];
+  }
+
   return {
-    getSelectedResources,
+    getAllResourcesByType,
     addResourceUser,
     addResourceGroup,
-    getResource,
-    getResourceByType,
-    getAllResourcesByType,
+    removeResourceUser,
+    removeAllResourcesUser,
+    removeResourceGroup,
+    removeAllResourcesGroup,
   };
 });
 

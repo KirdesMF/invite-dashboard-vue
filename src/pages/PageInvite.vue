@@ -185,6 +185,8 @@ function onSelectUsers(option: Group | User) {
   currentUserId.value = "";
 
   isSelectedAll.value = true;
+
+  console.log(currentGroupId.value);
 }
 
 /**
@@ -245,7 +247,10 @@ onMounted(async () => {
 
       <div class="hidden md:flex gap-x-sm items-center">
         <p class="font-200 text-sm">
-          <span class="text-green font-400">{{ countLicenses }}</span> licenses left
+          <span class="text-green font-400">
+            {{ countLicenses }}
+          </span>
+          {{ countLicenses < 1 ? "license" : "licenses" }} left
         </p>
 
         <div class="h-full w-[1px] bg-gray-300"></div>
@@ -322,6 +327,7 @@ onMounted(async () => {
                 :contacts-id="selectedGroupsStore.groupContactsId"
                 :class="{ 'bg-pink-50': isGroupSelected(group.uuid) }"
                 @click="onClickCardGroup(group.uuid)"
+                @delete="selectedGroupsStore.removeGroup(group.uuid)"
               />
             </li>
           </ul>
@@ -397,6 +403,7 @@ onMounted(async () => {
                   'hover:bg-pink-50': isUserSelected(userId),
                 }"
                 @click="onClickCardUser(userId)"
+                @delete="selectedGroupsStore.removeUserFromGroup(userId, currentGroupId)"
               />
             </li>
           </ul>
@@ -484,7 +491,7 @@ onMounted(async () => {
 
               <ul class="flex flex-wrap gap-xs">
                 <li v-for="resource in resourcesCampaignCurrentUser" :key="resource.uuid">
-                  <ButtonTag :resource="selectedResourcesStore.getResourceByType(resource.uuid, 'campaign')!" />
+                  <ButtonTag :resource="resource" />
                 </li>
               </ul>
             </div>
@@ -499,7 +506,7 @@ onMounted(async () => {
 
               <ul class="flex flex-wrap gap-xs">
                 <li v-for="resource in resourcesModelCurrentUser" :key="resource.uuid">
-                  <ButtonTag :resource="selectedResourcesStore.getResourceByType(resource.uuid, 'model')!" />
+                  <ButtonTag :resource="resource" />
                 </li>
               </ul>
             </div>

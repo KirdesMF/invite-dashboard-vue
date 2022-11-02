@@ -8,7 +8,7 @@ type Props = {
 };
 
 type Emits = {
-  (e: "click", tag: string): void;
+  (e: "click"): void;
 };
 
 // props
@@ -23,6 +23,6 @@ defineEmits<Emits>();
 <template>
   <div class="flex gap-x-xs border-1 border-gray rounded-md font-extralight text-xs px-2 py-1 max-w-[20ch]">
     <span class="truncate">{{ resource?.name }}</span>
-    <button type="button"><XMark /></button>
+    <button type="button" @click="$emit('click')"><XMark /></button>
   </div>
 </template>
