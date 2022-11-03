@@ -544,9 +544,9 @@ onMounted(async () => {
     </div>
 
     <footer class="py-4 px-4xl border-t-1 border-t-gray-200">
-      <div class="flex items-center justify-between">
-        <StepCounter :steps="steps" :current-step="currentStep" class="w-[6rem]" />
-
+      <div class="flex items-center justify-end gap-x-xl h-full">
+        <StepCounter :steps="steps" :current-step="currentStep" />
+        <div class="h-full w-[1px] bg-gray-300"></div>
         <div class="flex gap-x-sm items-center justify-center md:justify-end">
           <ButtonBase content="Previous" class="text-gray-700 hover:bg-gray-50" />
           <ButtonBase
