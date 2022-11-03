@@ -46,7 +46,7 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
 
     group?.resources.push(resource);
     group?.users.forEach((user) => {
-      const current = selectedUserStore.getUser(user)!;
+      const current = selectedUserStore.getUser(user.uuid)!;
       addResourceUser(resource, current?.uuid);
     });
   }
@@ -83,7 +83,7 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
 
     // remove resource group from users
     group.users.forEach((user) => {
-      const current = selectedUserStore.getUser(user)!;
+      const current = selectedUserStore.getUser(user.uuid)!;
       removeResourceUser(resource, current.uuid);
     });
   }
@@ -97,7 +97,7 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
 
     // remove resources group from users
     group.users.forEach((user) => {
-      const current = selectedUserStore.getUser(user)!;
+      const current = selectedUserStore.getUser(user.uuid)!;
       group.resources.forEach((resource) => removeResourceUser(resource, current.uuid));
     });
 

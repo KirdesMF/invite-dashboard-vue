@@ -8,7 +8,7 @@ import { useSelectedUsersStore } from "./selected-users.store";
 
 export type SelectedGroup = Group & {
   resources: Array<Resource>;
-  users: Array<string>;
+  users: Array<User>;
 };
 
 export const useSelectedGroupsStore = defineStore("selected-groups", () => {
@@ -45,7 +45,7 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
    */
   function isUserFromGroupContact(userId: string) {
     const group = getGroup(groupContactsId);
-    return group?.users.includes(userId);
+    return group?.users.some((user) => user.uuid === userId);
   }
 
   /**
@@ -75,10 +75,10 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
     const group = getGroup(groupContactsId)!;
 
     if (!group) {
-      groups.value.push({ ...groupContacts, users: [user.uuid] });
+      groups.value.push({ ...groupContacts, users: [user] });
       usersStore.addUser(user, groupContactsId, []);
     } else {
-      group.users.push(user.uuid);
+      group.users.push(user);
       usersStore.addUser(user, groupContactsId, group.resources);
     }
   }
@@ -96,7 +96,7 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
     users.forEach((user) => usersStore.addUser(user, group.uuid));
 
     // add group to selected groups
-    groups.value.push({ ...group, users: users.map((user) => user.uuid), resources: [] });
+    groups.value.push({ ...group, users: users.map((user) => user), resources: [] });
   }
 
   /**
@@ -106,7 +106,7 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
   function removeGroup(groupId: string) {
     const group = getGroup(groupId)!;
 
-    group.users.forEach((userId) => usersStore.removeUser(userId, groupId));
+    group.users.forEach((user) => usersStore.removeUser(user.uuid, groupId));
     groups.value = groups.value.filter((group) => group.uuid !== groupId);
   }
 
@@ -119,7 +119,7 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
     const group = getGroup(groupId)!;
 
     usersStore.removeUser(userId, groupId);
-    group.users = group.users.filter((user) => user !== userId);
+    group.users = group.users.filter((user) => user.uuid !== userId);
 
     if (group.users.length === 0) removeGroup(groupId);
   }

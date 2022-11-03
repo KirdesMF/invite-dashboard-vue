@@ -92,6 +92,7 @@ defineExpose({ current });
       @select="onSelect"
       :classes="{
         singleLabelText: 'font-thin text-3 capitalize truncate',
+        containerActive: '',
       }"
     >
       <template #placeholder>

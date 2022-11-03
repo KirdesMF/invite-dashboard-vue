@@ -6,7 +6,7 @@ const sizes = {
 };
 
 type Props = {
-  color: string;
+  color?: string;
   size?: keyof typeof sizes;
 };
 
@@ -16,5 +16,5 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <span class="rounded-full block" :class="sizes[size]" :style="{ backgroundColor: color }"></span>
+  <span class="rounded-full block" :class="sizes[size]" :style="{ backgroundColor: color || 'black' }"></span>
 </template>

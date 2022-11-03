@@ -35,7 +35,7 @@ defineEmits<Emits>();
       </span>
 
       <div class="text-xs font-extralight">
-        <p class="text-blue-500 font-400">{{ user.first_name }}</p>
+        <p class="text-blue font-400">{{ user.first_name }}</p>
         <p class="text-2">{{ user.job_title }}</p>
         <p class="text-2 italic lowercase">{{ user.email }}</p>
       </div>

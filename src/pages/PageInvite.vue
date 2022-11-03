@@ -29,6 +29,7 @@ import SelectAllIcon from "../components/icons/SelectAllIcon.vue";
 import GroupColor from "../components/GroupColor.vue";
 import ChevronDoubleLeftIcon from "../components/icons/ChevronDoubleLeftIcon.vue";
 import { useAuthStore } from "../stores/auth.store";
+import InputSearch from "../components/InputSearch.vue";
 
 type Step = "groups" | "users" | "resources";
 
@@ -41,7 +42,7 @@ const step = ref<Step>("groups");
 const currentGroupId = ref("");
 const currentUserId = ref("");
 const isSelectedAll = ref(false);
-
+const queryUsers = ref("");
 // components refs
 const selectUserRef = ref<InstanceType<typeof MultiSelectFiltered> | null>(null);
 const selectResourceGroupRef = ref<InstanceType<typeof MultiSelectFiltered> | null>(null);
@@ -94,6 +95,10 @@ const countResourcesGroupOrUser = computed(() =>
     : selectedUsersStore.getCountUserResources(currentUserId.value) || 0
 );
 
+const filteredGroupUsers = computed(() =>
+  currentGroup.value?.users.filter((user) => user.first_name.toLowerCase().includes(queryUsers.value.toLowerCase()))
+);
+
 const options = computed(() => [
   {
     id: "contacts",
@@ -123,6 +128,25 @@ const resourcesOptions = computed(() => [
     options: models.value,
   },
 ]);
+
+// class names sections
+const classNameSectionGroups = {
+  groups: "col-[1/-1] md:col-[1/2]",
+  users: "col-[1/2] -translate-x-full md:translate-x-0",
+  resources: "col-[1/2] -translate-x-full lg:translate-x-0",
+};
+
+const classNameSectionUsers = {
+  groups: "col-[1/-1] translate-x-full md:col-[2/3] md:translate-x-0",
+  users: "col-[1/-1] translate-x-0 md:col-[2/3] md:translate-x-0",
+  resources: "col-[1/2] -translate-x-full md:col-[2/3] md:-translate-x-full lg:translate-x-0",
+};
+
+const classNameSectionResources = {
+  groups: "col-[1/-1] translate-x-full md:col-[2/3] lg:col-[3/4] lg:translate-x-0",
+  users: "col-[1/-1] translate-x-full md:col-[2/3] lg:col-[3/4] lg:translate-x-0",
+  resources: "col-[1/-1] translate-x-0 md:col-[2/3] md:translate-x-0 lg:col-[3/4] lg:translate-x-0",
+};
 
 // methods
 function setStep(option: Step) {
@@ -197,6 +221,13 @@ function onSelectResource(option: Campaign | Model) {
     : selectedResourcesStore.addResourceUser(option, currentUserId.value);
 }
 
+function onSearchUsers(event: Event) {
+  const target = event.target as HTMLInputElement;
+  queryUsers.value = target.value;
+
+  isSelectedAll.value = false;
+}
+
 /**
  * remove all resources group or user
  */
@@ -205,24 +236,6 @@ function onClearAllResources() {
     ? selectedResourcesStore.removeAllResourcesGroup(currentGroupId.value)
     : selectedResourcesStore.removeAllResourcesUser(currentUserId.value);
 }
-
-const classNameSectionGroups = {
-  groups: "col-[1/-1] md:col-[1/2]",
-  users: "col-[1/2] -translate-x-full md:translate-x-0",
-  resources: "col-[1/2] -translate-x-full lg:translate-x-0",
-};
-
-const classNameSectionUsers = {
-  groups: "col-[1/-1] translate-x-full md:col-[2/3] md:translate-x-0",
-  users: "col-[1/-1] translate-x-0 md:col-[2/3] md:translate-x-0",
-  resources: "col-[1/2] -translate-x-full md:col-[2/3] md:-translate-x-full lg:translate-x-0",
-};
-
-const classNameSectionResources = {
-  groups: "col-[1/-1] translate-x-full md:col-[2/3] lg:col-[3/4] lg:translate-x-0",
-  users: "col-[1/-1] translate-x-full md:col-[2/3] lg:col-[3/4] lg:translate-x-0",
-  resources: "col-[1/-1] translate-x-0 md:col-[2/3] md:translate-x-0 lg:col-[3/4] lg:translate-x-0",
-};
 
 // lifecycle
 onMounted(async () => {
@@ -263,7 +276,7 @@ onMounted(async () => {
         <div class="h-full w-[1px] bg-gray-300"></div>
 
         <p class="font-300 text-sm text-gray-500">
-          Access up to <span class="font-500 text-blue-600">{{ accessUpToDate }}</span>
+          Access up to <span class="font-500 text-blue">{{ accessUpToDate }}</span>
         </p>
       </div>
     </header>
@@ -300,7 +313,7 @@ onMounted(async () => {
             </div>
 
             <p class="text-2.5">
-              Access up to <span class="text-blue-600 font-500">{{ accessUpToDate }}</span>
+              Access up to <span class="text-blue font-500">{{ accessUpToDate }}</span>
             </p>
           </div>
 
@@ -383,7 +396,10 @@ onMounted(async () => {
               <p>{{ selectedGroupsStore.getCountGroupResources(currentGroupId) }}</p>
             </div>
 
-            <p class="text-2.5 font-500">{{ currentGroup?.name }}</p>
+            <div v-if="currentGroup" class="flex items-center gap-x-1">
+              <GroupColor :color="currentGroup.color" size="small" />
+              <p class="text-2.5 font-500 text-blue">{{ currentGroup?.name }}</p>
+            </div>
           </div>
 
           <div class="flex gap-x-2 items-center h-full">
@@ -397,28 +413,30 @@ onMounted(async () => {
             </button>
           </div>
         </div>
-        <!-- 
-        <MultiSelectFiltered
+
+        <!-- <MultiSelectFiltered
           ref="selectResourceGroupRef"
           name="resource-group"
           :options="resourcesOptions"
           @select="onSelectResource"
-        />
+        /> -->
 
-        <div class="w-full h-[1px] bg-gray-200"></div> -->
+        <InputSearch @input="onSearchUsers" />
+
+        <div class="w-full h-[1px] bg-gray-200"></div>
 
         <!-- cards group -->
         <div class="overflow-auto scroller">
           <ul class="flex flex-col gap-y-1">
-            <li v-for="userId in currentGroup?.users" :key="userId">
+            <li v-for="user in filteredGroupUsers" :key="user.uuid">
               <CardUser
-                :user="selectedUsersStore.getUser(userId)!"
-                :resources-count="selectedUsersStore.getCountUserResources(userId) || 0"
+                :user="selectedUsersStore.getUser(user.uuid)!"
+                :resources-count="selectedUsersStore.getCountUserResources(user.uuid) || 0"
                 :class="{
-                  'bg-gray-200': isUserSelected(userId) || isSelectedAll,
+                  'bg-gray-200': isUserSelected(user.uuid) || isSelectedAll,
                 }"
-                @click="onClickCardUser(userId)"
-                @delete="selectedGroupsStore.removeUserFromGroup(userId, currentGroupId)"
+                @click="onClickCardUser(user.uuid)"
+                @delete="selectedGroupsStore.removeUserFromGroup(user.uuid, currentGroupId)"
               />
             </li>
           </ul>
@@ -434,7 +452,7 @@ onMounted(async () => {
           <button type="button" class="w-5 h-5 text-blue md:hidden" @click="setStep('users')">
             <ChevronDoubleLeftIcon />
           </button>
-          <p class="font-thin text-sm text-gray-500 max-w-[35ch] mx-auto text-center">Remove or clear resources</p>
+          <p class="font-thin text-sm text-gray-500 max-w-[35ch] mx-auto text-center">Manage resources</p>
         </div>
 
         <!-- resume -->
@@ -448,7 +466,18 @@ onMounted(async () => {
               </span>
               <p>{{ countResourcesGroupOrUser }}</p>
             </div>
-            <p class="text-2.5 font-500">{{ isSelectedAll ? currentGroup?.name : currentUser?.first_name }}</p>
+
+            <template v-if="currentGroup">
+              <div v-if="isSelectedAll" class="flex items-center gap-x-1">
+                <GroupColor :color="currentGroup.color" size="small" />
+                <p class="text-2.5 font-500 text-blue">{{ currentGroup?.name }}</p>
+              </div>
+
+              <div v-else class="flex items-center gap-x-1">
+                <GroupColor :color="currentGroup.color" size="small" />
+                <p class="text-2.5 font-500 text-blue">{{ currentUser?.first_name }}</p>
+              </div>
+            </template>
           </div>
 
           <div class="flex gap-x-2 items-center">
@@ -545,7 +574,11 @@ onMounted(async () => {
     <footer class="py-4 px-4 border-t-1 border-t-gray-200">
       <div class="flex gap-x-sm items-center justify-center md:justify-end">
         <ButtonBase content="Previous" class="text-gray-700 hover:bg-gray-50" />
-        <ButtonBase content="Send" class="bg-pink text-white hover:bg-pink-500" />
+        <ButtonBase
+          :disabled="selectedUsersStore.getSelectedUsers.length === 0"
+          class="bg-pink text-white hover:bg-pink-500"
+          content="Send"
+        />
       </div>
     </footer>
   </main>
