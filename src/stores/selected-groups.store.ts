@@ -16,6 +16,8 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
   const usersStore = useSelectedUsersStore();
 
   // states
+  const isLoading = ref(false);
+  const hasError = ref(false);
   const groups = ref<Array<SelectedGroup>>([]);
   const groupContactsId = window.crypto.randomUUID();
   const groupContacts: SelectedGroup = { uuid: groupContactsId, name: "Contacts", color: "", resources: [], users: [] };
@@ -90,13 +92,20 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
   async function addGroup(group: Group) {
     const numberOfUsers = getRandomNumber(5, 200);
 
-    const users = await createUsers(numberOfUsers);
+    try {
+      isLoading.value = true;
+      const users = await createUsers(numberOfUsers);
 
-    // add users to selected users
-    users.forEach((user) => usersStore.addUser(user, group.uuid));
+      // add users to selected users
+      users.forEach((user) => usersStore.addUser(user, group.uuid));
 
-    // add group to selected groups
-    groups.value.push({ ...group, users: users.map((user) => user), resources: [] });
+      // add group to selected groups
+      groups.value.push({ ...group, users: users.map((user) => user), resources: [] });
+    } catch (error) {
+      hasError.value = true;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   /**
@@ -133,6 +142,7 @@ export const useSelectedGroupsStore = defineStore("selected-groups", () => {
   }
 
   return {
+    isLoading,
     groupContactsId,
     getSelectedGroups,
     getGroup,

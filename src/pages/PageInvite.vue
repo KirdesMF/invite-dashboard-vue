@@ -30,6 +30,7 @@ import GroupColor from "../components/GroupColor.vue";
 import ChevronDoubleLeftIcon from "../components/icons/ChevronDoubleLeftIcon.vue";
 import InputSearch from "../components/InputSearch.vue";
 import ButtonTagGroup from "../components/ButtonTagGroup.vue";
+import SkeletonCardUser from "../components/SkeletonCardUser.vue";
 
 type Step = "groups" | "users" | "resources";
 
@@ -423,17 +424,23 @@ onMounted(async () => {
         <!-- cards group -->
         <div class="overflow-auto scroller">
           <ul class="flex flex-col gap-y-1">
-            <li v-for="user in filteredGroupUsers" :key="user.uuid">
-              <CardUser
-                :user="selectedUsersStore.getUser(user.uuid)!"
-                :resources-count="selectedUsersStore.getCountUserResources(user.uuid) || 0"
-                :class="{
-                  'bg-gray-200': isUserSelected(user.uuid) || isSelectedAll,
-                }"
-                @click="onClickCardUser(user.uuid)"
-                @delete="selectedGroupsStore.removeUserFromGroup(user.uuid, currentGroupId)"
-              />
-            </li>
+            <template v-if="selectedGroupsStore.isLoading">
+              <SkeletonCardUser v-for="count in 5" :key="count" :style="{ animationDelay: count * 0.2 }" />
+            </template>
+
+            <template v-else>
+              <li v-for="user in filteredGroupUsers" :key="user.uuid">
+                <CardUser
+                  :user="selectedUsersStore.getUser(user.uuid)!"
+                  :resources-count="selectedUsersStore.getCountUserResources(user.uuid) || 0"
+                  :class="{
+                    'bg-gray-200': isUserSelected(user.uuid) || isSelectedAll,
+                  }"
+                  @click="onClickCardUser(user.uuid)"
+                  @delete="selectedGroupsStore.removeUserFromGroup(user.uuid, currentGroupId)"
+                />
+              </li>
+            </template>
           </ul>
         </div>
       </section>

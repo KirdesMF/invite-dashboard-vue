@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { computed } from "vue";
-
 const props = defineProps<{
   steps: number;
   currentStep: number;
 }>();
 
-function setSetpClassName(step: number) {
+function setStepClassName(step: number) {
   return {
     "border-gray-300": step !== props.currentStep,
     "text-gray-300": step !== props.currentStep,
@@ -22,8 +20,8 @@ function setSetpClassName(step: number) {
     <span
       v-for="step in steps"
       :key="step"
-      :class="setSetpClassName(step)"
       class="grid place-items-center h-8 w-8 rounded-full border-2 text-xs transition-border-color transition-color duration-300"
+      :class="setStepClassName(step)"
     >
       {{ step }}
     </span>
