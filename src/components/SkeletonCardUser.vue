@@ -10,19 +10,23 @@
   </div>
 </template>
 
+<style>
+:root {
+  --delay: 0;
+}
+</style>
 <style scoped>
 @keyframes skeleton {
   from {
     background-color: #e2e8f0;
   }
   to {
-    background-color: #cad6e2;
+    background-color: #dfe3e6;
   }
 }
 
 .skeleton {
-  --delay: 0s;
-  animation: skeleton 250ms infinite alternate;
+  animation: skeleton 300ms infinite alternate;
   animation-delay: var(--delay);
 }
 </style>

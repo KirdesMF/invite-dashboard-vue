@@ -425,7 +425,7 @@ onMounted(async () => {
         <div class="overflow-auto scroller">
           <ul class="flex flex-col gap-y-1">
             <template v-if="selectedGroupsStore.isLoading">
-              <SkeletonCardUser v-for="count in 5" :key="count" :style="{ animationDelay: count * 0.2 }" />
+              <SkeletonCardUser v-for="count in 5" :key="count" :style="{ '--delay': `${count * 75}ms` }" />
             </template>
 
             <template v-else>
