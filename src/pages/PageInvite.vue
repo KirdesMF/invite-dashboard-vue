@@ -9,27 +9,27 @@ import { useCampaignsStore } from "../stores/campaigns.store";
 import { useModelsStore } from "../stores/models.store";
 import { useSelectedUsersStore } from "../stores/selected-users.store";
 import { useSelectedResourcesStore } from "../stores/selected-resources.store";
+import { useAuthStore } from "../stores/auth.store";
 
 import type { Group } from "../data/group";
 import type { User } from "../data/user";
 import type { Campaign } from "../data/campaign";
 import type { Model } from "../data/model";
 
+import StepCounter from "../components/StepCounter.vue";
 import CardGroup from "../components/CardGroup.vue";
 import CardUser from "../components/CardUser.vue";
 import ButtonBase from "../components/ButtonBase.vue";
 import MultiSelectFiltered from "../components/MultiSelectFiltered.vue";
-import StepCounter from "../components/StepCounter.vue";
 import UserGroup from "../components/icons/UserGroup.vue";
 import UserIcon from "../components/icons/UserIcon.vue";
 import FoldersIcon from "../components/icons/FoldersIcon.vue";
 import XMark from "../components/icons/XMark.vue";
-import ButtonTag from "../components/ButtonTag.vue";
 import SelectAllIcon from "../components/icons/SelectAllIcon.vue";
 import GroupColor from "../components/GroupColor.vue";
 import ChevronDoubleLeftIcon from "../components/icons/ChevronDoubleLeftIcon.vue";
-import { useAuthStore } from "../stores/auth.store";
 import InputSearch from "../components/InputSearch.vue";
+import ButtonTagGroup from "../components/ButtonTagGroup.vue";
 
 type Step = "groups" | "users" | "resources";
 
@@ -414,13 +414,6 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- <MultiSelectFiltered
-          ref="selectResourceGroupRef"
-          name="resource-group"
-          :options="resourcesOptions"
-          @select="onSelectResource"
-        /> -->
-
         <InputSearch @input="onSearchUsers" />
 
         <div class="w-full h-[1px] bg-gray-200"></div>
@@ -498,87 +491,61 @@ onMounted(async () => {
         <div class="overflow-auto scroller">
           <!-- if selected all is true group tags -->
           <div v-if="isSelectedAll && currentGroup?.resources.length" class="flex flex-col gap-lg">
-            <div class="flex flex-col gap-y-xs">
-              <h2 class="text-xs font-light">
-                <span>Campaigns</span>
-                <span class="text-gray-400 text-2.5 font-500"> ({{ resourcesCampaignCurrentGroup.length }}) </span>
-              </h2>
-              <ul class="flex flex-wrap gap-xs">
-                <li v-for="resource in resourcesCampaignCurrentGroup" :key="resource.uuid">
-                  <ButtonTag
-                    :resource="resource"
-                    @click="selectedResourcesStore.removeResourceGroup(resource, currentGroupId)"
-                  />
-                </li>
-              </ul>
-            </div>
+            <h3 class="font-200 text-xs underline">Group resources</h3>
+            <ButtonTagGroup
+              :resources="resourcesCampaignCurrentGroup"
+              title="Campaigns"
+              :id="currentGroup?.uuid"
+              @click:chip="selectedResourcesStore.removeResourceGroup"
+            />
 
             <div class="h-[1px] w-full bg-gray-300"></div>
 
-            <div class="flex flex-col gap-y-xs">
-              <h2 class="text-xs font-light">
-                <span>Models</span>
-                <span class="text-gray-400 text-2.5 font-500"> ({{ resourcesModelCurrentGroup.length }}) </span>
-              </h2>
-              <ul class="flex flex-wrap gap-xs">
-                <li v-for="resource in resourcesModelCurrentGroup" :key="resource.uuid">
-                  <ButtonTag
-                    :resource="resource"
-                    @click="selectedResourcesStore.removeResourceGroup(resource, currentGroupId)"
-                  />
-                </li>
-              </ul>
-            </div>
+            <ButtonTagGroup
+              :resources="resourcesModelCurrentGroup"
+              title="Models"
+              :id="currentGroup?.uuid"
+              @click:chip="selectedResourcesStore.removeResourceGroup"
+            />
           </div>
 
           <!-- user tags -->
-          <div v-if="currentUser?.resources.length" class="flex flex-col gap-lg">
-            <div class="flex flex-col gap-y-xs">
-              <h2 class="text-xs font-light">
-                <span>Campaigns</span>
-                <span class="text-gray-400 text-2.5 font-500"> ({{ resourcesCampaignCurrentUser.length }}) </span>
-              </h2>
 
-              <ul class="flex flex-wrap gap-xs">
-                <li v-for="resource in resourcesCampaignCurrentUser" :key="resource.uuid">
-                  <ButtonTag
-                    :resource="resource"
-                    @click="selectedResourcesStore.removeResourceUser(resource, currentUserId)"
-                  />
-                </li>
-              </ul>
-            </div>
+          <div v-if="currentUser?.resources.length" class="flex flex-col gap-lg">
+            <h3 class="font-200 text-xs underline">{{ currentUser.first_name }} resources</h3>
+
+            <ButtonTagGroup
+              :resources="resourcesCampaignCurrentUser"
+              title="Campaigns"
+              :id="currentUser?.uuid"
+              @click:chip="selectedResourcesStore.removeResourceUser"
+            />
 
             <div class="h-[1px] w-full bg-gray-300"></div>
 
-            <div class="flex flex-col gap-y-xs">
-              <h2 class="text-xs font-light">
-                <span>Models</span>
-                <span class="text-gray-400 text-2.5 font-500"> ({{ resourcesModelCurrentUser.length }}) </span>
-              </h2>
-
-              <ul class="flex flex-wrap gap-xs">
-                <li v-for="resource in resourcesModelCurrentUser" :key="resource.uuid">
-                  <ButtonTag
-                    :resource="resource"
-                    @click="selectedResourcesStore.removeResourceUser(resource, currentUserId)"
-                  />
-                </li>
-              </ul>
-            </div>
+            <ButtonTagGroup
+              :resources="resourcesModelCurrentUser"
+              title="Models"
+              :id="currentUser?.uuid"
+              @click:chip="selectedResourcesStore.removeResourceUser"
+            />
           </div>
         </div>
       </section>
     </div>
 
-    <footer class="py-4 px-4 border-t-1 border-t-gray-200">
-      <div class="flex gap-x-sm items-center justify-center md:justify-end">
-        <ButtonBase content="Previous" class="text-gray-700 hover:bg-gray-50" />
-        <ButtonBase
-          :disabled="selectedUsersStore.getSelectedUsers.length === 0"
-          class="bg-pink text-white hover:bg-pink-500"
-          content="Send"
-        />
+    <footer class="py-4 px-4xl border-t-1 border-t-gray-200">
+      <div class="flex items-center justify-between">
+        <StepCounter :steps="steps" :current-step="currentStep" class="w-[6rem]" />
+
+        <div class="flex gap-x-sm items-center justify-center md:justify-end">
+          <ButtonBase content="Previous" class="text-gray-700 hover:bg-gray-50" />
+          <ButtonBase
+            :disabled="selectedUsersStore.getSelectedUsers.length === 0"
+            class="bg-pink text-white hover:bg-pink-500"
+            content="Send"
+          />
+        </div>
       </div>
     </footer>
   </main>
