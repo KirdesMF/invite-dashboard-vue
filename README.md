@@ -25,55 +25,55 @@ In this demo, there is no search or infinite scroll inside selects. The point is
 
 ## Todo
 
-- Add search to selected users
-- virtualize user list or create pagination ?
-- local storage free or pro
-- disable others panels if no users or groups are selected => filter grayscale + pointer-events: none
-- loading state
-- error state
-- add illustration empty state
-- empty group toaster
+- Add search to selected users [x]
+- virtualize user list or create pagination ? [x]
+- local storage free or pro version [x]
+- disable others panels if no users or groups are selected => filter grayscale + pointer-events: none [x]
+- loading state for api calls [x]
+- error state for api calls [x]
+- add illustration empty state [x]
+- empty group toaster [x]
   - random user created from 0
-- remove resource
-- routes
-- free and pro
-- first step simple design
-- remove one of select resources
-- refactor
-- fix issue display resources
+- remove resource [x]
+- routes [x]
+- free and pro version [x]
+- first step simple design [x]
+- remove one of select resources [x]
+- refactor [x]
+- fix issue display resources [x]
   => select user resource
   => select group
   => both resources are displayed
-- hide button back step when needed
-- improve design back button
-- add number of licenses
-- add number of managers selected from step one
-- design footer and headers
-- max width cards
-- disabled already selected resources in selects
-- find icons models and campaigns
+- hide button back step when needed [x]
+- improve design back button [x]
+- add number of licenses [x]
+- add number of managers selected from step one [x]
+- design footer and headers [x]
+- max width cards [x]
+- disabled already selected resources in selects [x]
+- find icons models and campaigns [x]
   - add to list in select
   - add to button select
   - add to review resources
-- fake post request
-- modal success
-- modal leave page
-- fix issue select all on mobile
-- add design to list users when select all
-- add design to cards when selected
-- add design to cards when selected
+- fake post request [x]
+- modal success [x]
+- modal leave page [x]
+- fix issue select all on mobile [x]
+- add design to list users when select all [x]
+- add design to cards when selected [x]
+- add design to cards when selected [x]
   - remove chevron right ?
-- add color circle or user avatar in resource panel when selected
-- home page add description design
-- reset campaigns
-- reset models
-- scroll top panel
-- scroll to selected user or group
-- panel resources
+- add color circle or user avatar in resource panel when selected [x]
+- home page add description design [x]
+- reset campaigns [x]
+- reset models [x]
+- scroll top panel [x]
+- scroll to selected user or group [x]
+- panel resources [x]
   - show global and individual resources selected
   - add design to cards when selected
   - add color circle or user avatar in resource panel when selected
-- clear all resources from group
+- clear all resources from group [x]
   - clear everything even user resources ?
   - clear only group resources and keep user resources ?
 
