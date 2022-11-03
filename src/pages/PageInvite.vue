@@ -192,6 +192,7 @@ function onClickCardUser(userId: string) {
 function onClickSelectAll() {
   isSelectedAll.value = !isSelectedAll.value;
   currentUserId.value = "";
+  queryUsers.value = "";
   setStep("resources");
 }
 
@@ -226,6 +227,7 @@ function onSearchUsers(event: Event) {
   queryUsers.value = target.value;
 
   isSelectedAll.value = false;
+  currentUserId.value = "";
 }
 
 /**
