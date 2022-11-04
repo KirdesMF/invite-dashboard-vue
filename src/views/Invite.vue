@@ -42,7 +42,10 @@ const currentStep = ref(2);
 const step = ref<Step>("groups");
 const currentGroupId = ref("");
 const currentUserId = ref("");
+const isCardGroupSelected = ref(false);
+const isCardUserSelected = ref(false);
 const isSelectedAll = ref(false);
+
 const queryUsers = ref("");
 // components refs
 const selectUserRef = ref<InstanceType<typeof MultiSelectFiltered> | null>(null);
@@ -172,9 +175,8 @@ function isUserSelected(userId: string) {
  * @param groupId
  */
 function onClickCardGroup(groupId: string) {
-  isSelectedAll.value = true;
+  isCardGroupSelected.value = true;
   currentGroupId.value = groupId;
-  currentUserId.value = "";
   setStep("users");
 }
 
@@ -183,6 +185,7 @@ function onClickCardGroup(groupId: string) {
  */
 function onClickCardUser(userId: string) {
   isSelectedAll.value = false;
+  isCardUserSelected.value = true;
   currentUserId.value = userId;
   setStep("resources");
 }
@@ -192,7 +195,6 @@ function onClickCardUser(userId: string) {
  */
 function onClickSelectAll() {
   isSelectedAll.value = !isSelectedAll.value;
-  currentUserId.value = "";
   queryUsers.value = "";
   setStep("resources");
 }
@@ -208,9 +210,9 @@ function onSelectUsers(option: Group | User) {
   else selectedGroupsStore.addGroup(option as Group);
 
   currentGroupId.value = hasContactSelected ? selectedGroupsStore.groupContactsId : option.uuid;
-  currentUserId.value = "";
 
-  isSelectedAll.value = true;
+  isCardUserSelected.value = false;
+  isSelectedAll.value = false;
 }
 
 /**
@@ -225,9 +227,10 @@ function onSelectResource(option: Campaign | Model) {
 
 function onSearchUsers(event: Event) {
   const target = event.target as HTMLInputElement;
-  queryUsers.value = target.value;
 
+  queryUsers.value = target.value;
   isSelectedAll.value = false;
+  isCardUserSelected.value = false;
   currentUserId.value = "";
 }
 
@@ -499,21 +502,22 @@ onMounted(async () => {
         <!-- cards group -->
         <div class="overflow-auto scroller">
           <!-- if selected all is true group tags -->
-          <div v-if="isSelectedAll && currentGroup?.resources.length" class="flex flex-col gap-lg">
-            <h3 class="font-200 text-xs underline">Group resources</h3>
+          <div v-if="currentGroup?.resources.length" class="flex flex-col gap-lg">
+            <h3 class="font-200 text-xs underline">{{ currentGroup.name }} resources</h3>
+
             <ButtonTagGroup
-              :resources="resourcesCampaignCurrentGroup"
               title="Campaigns"
-              :id="currentGroup?.uuid"
+              :resources="resourcesCampaignCurrentGroup"
+              :id="currentGroup.uuid"
               @click:chip="selectedResourcesStore.removeResourceGroup"
             />
 
             <div class="h-[1px] w-full bg-gray-300"></div>
 
             <ButtonTagGroup
-              :resources="resourcesModelCurrentGroup"
               title="Models"
-              :id="currentGroup?.uuid"
+              :resources="resourcesModelCurrentGroup"
+              :id="currentGroup.uuid"
               @click:chip="selectedResourcesStore.removeResourceGroup"
             />
           </div>
@@ -524,18 +528,18 @@ onMounted(async () => {
             <h3 class="font-200 text-xs underline">{{ currentUser.first_name }} resources</h3>
 
             <ButtonTagGroup
-              :resources="resourcesCampaignCurrentUser"
               title="Campaigns"
-              :id="currentUser?.uuid"
+              :resources="resourcesCampaignCurrentUser"
+              :id="currentUser.uuid"
               @click:chip="selectedResourcesStore.removeResourceUser"
             />
 
             <div class="h-[1px] w-full bg-gray-300"></div>
 
             <ButtonTagGroup
-              :resources="resourcesModelCurrentUser"
               title="Models"
-              :id="currentUser?.uuid"
+              :resources="resourcesModelCurrentUser"
+              :id="currentUser.uuid"
               @click:chip="selectedResourcesStore.removeResourceUser"
             />
           </div>
@@ -544,9 +548,11 @@ onMounted(async () => {
     </div>
 
     <footer class="py-4 px-4xl border-t-1 border-t-gray-200">
-      <div class="flex items-center justify-end gap-x-xl h-full">
+      <div class="flex items-center justify-center md:justify-end gap-x-xl h-full">
         <StepCounter :steps="steps" :current-step="currentStep" />
+
         <div class="h-full w-[1px] bg-gray-300"></div>
+
         <div class="flex gap-x-sm items-center justify-center md:justify-end">
           <ButtonBase content="Previous" class="text-gray-700 hover:bg-gray-50" />
           <ButtonBase

@@ -1,5 +1,4 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
-import { computed, ref } from "vue";
 import { Campaign } from "../data/campaign";
 import { Model } from "../data/model";
 import { useSelectedGroupsStore } from "./selected-groups.store";
@@ -9,6 +8,7 @@ export type Resource = {
   uuid: string;
   type: "campaign" | "model";
   name: string;
+  groupId?: string;
 };
 
 export const useSelectedResourcesStore = defineStore("selected-resources", () => {
@@ -22,6 +22,14 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
    */
   function getAllResourcesByType(resources: Array<Resource>, type: "campaign" | "model") {
     return resources.filter((resource) => resource.type === type);
+  }
+
+  /**
+   * @param resources
+   * @param groupId
+   */
+  function getAllResourcesByGroupId(resources: Array<Resource>, groupId: string) {
+    return resources.filter((resource) => resource.groupId === groupId);
   }
 
   /**
@@ -107,6 +115,7 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
 
   return {
     getAllResourcesByType,
+    getAllResourcesByGroupId,
     addResourceUser,
     addResourceGroup,
     removeResourceUser,

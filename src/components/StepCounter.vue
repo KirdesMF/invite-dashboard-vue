@@ -16,7 +16,7 @@ function setStepClassName(step: number) {
 </script>
 
 <template>
-  <div class="grid auto-cols-[min-content_5rem] grid-flow-col grid-rows-[2rem] items-center">
+  <div class="grid auto-cols-[min-content_4rem] grid-flow-col grid-rows-[2rem] items-center">
     <template v-for="step in steps" :key="step">
       <span
         class="grid place-items-center h-8 w-8 rounded-full border-2 text-xs transition-border-color transition-color duration-300"
