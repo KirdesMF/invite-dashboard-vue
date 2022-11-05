@@ -134,7 +134,9 @@ const resourcesOptions = computed(() => [
     id: "models",
     label: "models",
     placeholder: "Select models",
-    options: models.value,
+    options: isSelectedAll.value
+      ? modelStore.getModelsGroup(currentGroupId.value)
+      : modelStore.getModelsUser(currentUserId.value),
   },
 ]);
 
@@ -606,9 +608,9 @@ onMounted(async () => {
 
     <footer class="py-4 px-4xl border-t-1 border-t-gray-200">
       <div class="flex items-center justify-center md:justify-end gap-x-xl h-full">
-        <StepCounter :steps="steps" :current-step="currentStep" />
+        <StepCounter :steps="steps" :current-step="currentStep" class="display-none md:grid" />
 
-        <div class="h-full w-[1px] bg-gray-300"></div>
+        <div class="h-full w-[1px] bg-gray-300 display-none md:grid"></div>
 
         <div class="flex gap-x-sm items-center justify-center md:justify-end">
           <ButtonBase content="Previous" class="text-gray-700 hover:bg-gray-50" />

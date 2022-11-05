@@ -137,6 +137,8 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
   return {
     getAllResourcesByType,
     getAllResourcesByGroupId,
+    isSelectedResourceGroup,
+    isSelectedResourceUser,
     addResourceUser,
     addResourceGroup,
     removeResourceUser,
