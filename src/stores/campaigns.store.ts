@@ -1,11 +1,14 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { Campaign, createCampaigns } from "../data/campaign";
+import { useSelectedResourcesStore } from "./selected-resources.store";
 
 export const useCampaignsStore = defineStore("campaigns", () => {
   const campaigns = ref<Campaign[]>([]);
   const isLoading = ref(false);
   const hasError = ref(false);
+
+  const resourcesStore = useSelectedResourcesStore();
 
   const getCampaigns = computed(() =>
     campaigns.value.map((campaign) => ({
@@ -13,6 +16,32 @@ export const useCampaignsStore = defineStore("campaigns", () => {
       value: campaign,
     }))
   );
+
+  /**
+   *
+   * @param groupId
+   * @returns
+   */
+  function getCampaignsGroup(groupId: string) {
+    return campaigns.value.map((campaign) => ({
+      label: campaign.name,
+      value: campaign,
+      disabled: resourcesStore.isSelectedResourceGroup(campaign, groupId),
+    }));
+  }
+
+  /**
+   *
+   * @param userId
+   * @returns
+   */
+  function getCampaignsUser(userId: string) {
+    return campaigns.value.map((campaign) => ({
+      label: campaign.name,
+      value: campaign,
+      disabled: resourcesStore.isSelectedResourceUser(campaign, userId),
+    }));
+  }
 
   async function setCampaigns() {
     try {
@@ -28,6 +57,8 @@ export const useCampaignsStore = defineStore("campaigns", () => {
   return {
     isLoading,
     getCampaigns,
+    getCampaignsGroup,
+    getCampaignsUser,
     setCampaigns,
   };
 });

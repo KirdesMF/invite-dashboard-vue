@@ -32,6 +32,7 @@ import InputSearch from "../components/InputSearch.vue";
 import ButtonTagGroup from "../components/ButtonTagGroup.vue";
 import SkeletonCardUser from "../components/SkeletonCardUser.vue";
 import Loader from "../components/Loader.vue";
+import { useCurrentStore } from "../stores/current.store";
 
 type Step = "groups" | "users" | "resources";
 
@@ -41,8 +42,6 @@ const steps = 2;
 // refs
 const currentStep = ref(2);
 const step = ref<Step>("groups");
-const currentGroupId = ref("");
-const currentUserId = ref("");
 const isCardGroupSelected = ref(false);
 const isCardUserSelected = ref(false);
 const isSelectedAll = ref(false);
@@ -58,6 +57,7 @@ const groupsStore = useGroupsStore();
 const usersStore = useUsersStore();
 const campaignStore = useCampaignsStore();
 const modelStore = useModelsStore();
+const currentStore = useCurrentStore();
 const selectedGroupsStore = useSelectedGroupsStore();
 const selectedUsersStore = useSelectedUsersStore();
 const selectedResourcesStore = useSelectedResourcesStore();
@@ -69,39 +69,22 @@ const isPro = computed(() => authStore.isPro);
 
 const groups = computed(() => groupsStore.getGroups);
 const users = computed(() => usersStore.getUsers);
-const campaigns = computed(() => campaignStore.getCampaigns);
-const models = computed(() => modelStore.getModels);
 
 const selectedGroups = computed(() => selectedGroupsStore.getSelectedGroups);
 const selectedUsers = computed(() => selectedUsersStore.getSelectedUsers);
 
-const currentGroup = computed(() => selectedGroups.value.find((group) => group.uuid === currentGroupId.value));
-const currentUser = computed(() => selectedUsers.value.find((user) => user.uuid === currentUserId.value));
+const currentGroup = computed(() => currentStore.getCurrentGroup);
+const currentUser = computed(() => currentStore.getCurrentUser);
 
-const resourcesCampaignCurrentGroup = computed(() => {
-  return selectedResourcesStore.getAllResourcesByType(currentGroup.value?.resources!, "campaign");
-});
-
-const resourcesModelCurrentGroup = computed(() => {
-  return selectedResourcesStore.getAllResourcesByType(currentGroup.value?.resources!, "model");
-});
-
-const resourcesCampaignCurrentUser = computed(() => {
-  return selectedResourcesStore
-    .getAllResourcesByType(currentUser.value?.resources!, "campaign")
-    .filter((campaign) => campaign.groupId !== currentGroupId.value);
-});
-
-const resourcesModelCurrentUser = computed(() => {
-  return selectedResourcesStore
-    .getAllResourcesByType(currentUser.value?.resources!, "model")
-    .filter((model) => model.groupId !== currentGroupId.value);
-});
+const resourcesCampaignCurrentGroup = computed(() => currentStore.getCurrentGroupCampaigns);
+const resourcesModelCurrentGroup = computed(() => currentStore.getCurrentGroupModels);
+const resourcesCampaignCurrentUser = computed(() => currentStore.getCurrentUserCampaigns);
+const resourcesModelCurrentUser = computed(() => currentStore.getCurrentUserModels);
 
 const countResourcesGroupOrUser = computed(() =>
   isSelectedAll.value
-    ? selectedGroupsStore.getCountGroupResources(currentGroupId.value) || 0
-    : selectedUsersStore.getCountUserResources(currentUserId.value) || 0
+    ? selectedGroupsStore.getCountGroupResources(currentStore.current.groupId) || 0
+    : selectedUsersStore.getCountUserResources(currentStore.current.userId) || 0
 );
 
 const filteredGroupUsers = computed(() =>
@@ -128,15 +111,17 @@ const resourcesOptions = computed(() => [
     id: "campaigns",
     label: "campaigns",
     placeholder: "Select campaigns",
-    options: campaigns.value,
+    options: isSelectedAll.value
+      ? campaignStore.getCampaignsGroup(currentStore.current.groupId)
+      : campaignStore.getCampaignsUser(currentStore.current.userId),
   },
   {
     id: "models",
     label: "models",
     placeholder: "Select models",
     options: isSelectedAll.value
-      ? modelStore.getModelsGroup(currentGroupId.value)
-      : modelStore.getModelsUser(currentUserId.value),
+      ? modelStore.getModelsGroup(currentStore.current.groupId)
+      : modelStore.getModelsUser(currentStore.current.userId),
   },
 ]);
 
@@ -172,14 +157,14 @@ function setStep(option: Step) {
  * @param groupId
  */
 function isGroupSelected(groupId: string) {
-  return currentGroupId.value === groupId;
+  return currentStore.current.groupId === groupId;
 }
 
 /**
  * @param userId
  */
 function isUserSelected(userId: string) {
-  return currentUserId.value === userId;
+  return currentStore.current.userId === userId;
 }
 
 /**
@@ -188,7 +173,7 @@ function isUserSelected(userId: string) {
 function onClickCardGroup(groupId: string) {
   isCardGroupSelected.value = true;
   isSelectedAll.value = true;
-  currentGroupId.value = groupId;
+  currentStore.setCurrentGroupId(groupId);
   setStep("users");
 }
 
@@ -198,7 +183,7 @@ function onClickCardGroup(groupId: string) {
 function onClickCardUser(userId: string) {
   isSelectedAll.value = false;
   isCardUserSelected.value = true;
-  currentUserId.value = userId;
+  currentStore.setCurrentUserId(userId);
   setStep("resources");
 }
 
@@ -209,7 +194,7 @@ function onClickSelectAll() {
   isSelectedAll.value = !isSelectedAll.value;
   isCardUserSelected.value = false;
   queryUsers.value = "";
-  currentUserId.value = "";
+  currentStore.setCurrentUserId("");
   setStep("resources");
 }
 
@@ -223,10 +208,11 @@ function onSelectUsers(option: Group | User) {
   if (hasContactSelected) selectedGroupsStore.addUserToGroupContact(option as User);
   else selectedGroupsStore.addGroup(option as Group);
 
-  currentGroupId.value = hasContactSelected ? selectedGroupsStore.groupContactsId : option.uuid;
+  currentStore.setCurrentGroupId(hasContactSelected ? selectedGroupsStore.groupContactsId : option.uuid);
+
+  isSelectedAll.value = true;
 
   isCardUserSelected.value = false;
-  isSelectedAll.value = true;
   isCardGroupSelected.value = true;
 }
 
@@ -236,8 +222,8 @@ function onSelectUsers(option: Group | User) {
  */
 function onSelectResource(option: Campaign | Model) {
   isSelectedAll.value
-    ? selectedResourcesStore.addResourceGroup(option, currentGroupId.value)
-    : selectedResourcesStore.addResourceUser(option, currentUserId.value);
+    ? selectedResourcesStore.addResourceGroup(option, currentStore.current.groupId)
+    : selectedResourcesStore.addResourceUser(option, currentStore.current.userId);
 }
 
 /**
@@ -249,7 +235,7 @@ function onSearchUsers(event: Event) {
   queryUsers.value = target.value;
   isSelectedAll.value = false;
   isCardUserSelected.value = false;
-  currentUserId.value = "";
+  currentStore.setCurrentUserId("");
 }
 
 /**
@@ -257,8 +243,8 @@ function onSearchUsers(event: Event) {
  */
 function onClearAllResources() {
   isSelectedAll.value
-    ? selectedResourcesStore.removeAllResourcesGroup(currentGroupId.value)
-    : selectedResourcesStore.removeAllResourcesUser(currentUserId.value);
+    ? selectedResourcesStore.removeAllResourcesGroup(currentStore.current.groupId)
+    : selectedResourcesStore.removeAllResourcesUser(currentStore.current.userId);
 }
 
 // lifecycle
@@ -362,7 +348,7 @@ onMounted(async () => {
               <span class="text-sm font-extralight">{{ option.label }}</span>
             </div>
 
-            <div v-if="selectedGroupsStore.isLoading && option.uuid === currentGroupId" class="w-4 h-4">
+            <div v-if="selectedGroupsStore.isLoading && option.uuid === currentStore.current.groupId" class="w-4 h-4">
               <Loader />
             </div>
             <div v-if="option.disabled && !selectedGroupsStore.isLoading">
@@ -417,14 +403,14 @@ onMounted(async () => {
               <span class="text-gray-400">
                 <UserIcon />
               </span>
-              <p>{{ selectedGroupsStore.getCountGroupResources(currentGroupId) }}</p>
+              <p>{{ selectedGroupsStore.getCountGroupUsers(currentStore.current.groupId) }}</p>
             </div>
 
             <div class="flex items-center gap-x-0.5">
               <span class="text-gray-400">
                 <FoldersIcon />
               </span>
-              <p>{{ selectedGroupsStore.getCountGroupResources(currentGroupId) }}</p>
+              <p>{{ selectedGroupsStore.getCountGroupResources(currentStore.current.groupId) }}</p>
             </div>
 
             <div v-if="currentGroup" class="flex items-center gap-x-1">
@@ -465,7 +451,7 @@ onMounted(async () => {
                     'bg-gray-200': isUserSelected(user.uuid) || isSelectedAll,
                   }"
                   @click="onClickCardUser(user.uuid)"
-                  @delete="selectedGroupsStore.removeUserFromGroup(user.uuid, currentGroupId)"
+                  @delete="selectedGroupsStore.removeUserFromGroup(user.uuid, currentStore.current.groupId)"
                 />
               </li>
             </template>
@@ -504,7 +490,9 @@ onMounted(async () => {
               </div>
 
               <div v-else class="flex items-center gap-x-1">
-                <GroupColor :color="currentGroup.color" size="small" />
+                <span class="w-4 h-4 grid place-items-center">
+                  <img :src="currentUser?.avatar" alt="avatar" class="rounded-full" />
+                </span>
                 <p class="text-2.5 font-500 text-blue">{{ currentUser?.first_name }}</p>
               </div>
             </template>
@@ -539,7 +527,7 @@ onMounted(async () => {
 
               <div v-else class="flex flex-col gap-lg">
                 <h3 class="font-200 text-xs underline flex gap-x-1">
-                  <GroupColor :color="currentGroup.color" size="small" />
+                  <GroupColor :color="currentGroup.color" size="medium" />
                   <span>{{ currentGroup.name }} resources</span>
                 </h3>
 

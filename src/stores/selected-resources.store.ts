@@ -4,9 +4,10 @@ import { Model } from "../data/model";
 import { useSelectedGroupsStore } from "./selected-groups.store";
 import { useSelectedUsersStore } from "./selected-users.store";
 
+export type ResourceType = "campaign" | "model";
 export type Resource = {
   uuid: string;
-  type: "campaign" | "model";
+  type: ResourceType;
   name: string;
   groupId?: string;
 };
@@ -34,22 +35,6 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
   function isSelectedResourceUser(resource: Resource, userId: string) {
     const user = selectedUserStore.getUser(userId);
     return user?.resources.some((r) => r.uuid === resource.uuid);
-  }
-
-  /**
-   * @param resources
-   * @param type
-   */
-  function getAllResourcesByType(resources: Array<Resource>, type: "campaign" | "model") {
-    return resources.filter((resource) => resource.type === type);
-  }
-
-  /**
-   * @param resources
-   * @param groupId
-   */
-  function getAllResourcesByGroupId(resources: Array<Resource>, groupId: string) {
-    return resources.filter((resource) => resource.groupId === groupId);
   }
 
   /**
@@ -135,8 +120,6 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
   }
 
   return {
-    getAllResourcesByType,
-    getAllResourcesByGroupId,
     isSelectedResourceGroup,
     isSelectedResourceUser,
     addResourceUser,
