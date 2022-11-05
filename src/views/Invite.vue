@@ -86,11 +86,15 @@ const resourcesModelCurrentGroup = computed(() => {
 });
 
 const resourcesCampaignCurrentUser = computed(() => {
-  return selectedResourcesStore.getAllResourcesByType(currentUser.value?.resources!, "campaign");
+  return selectedResourcesStore
+    .getAllResourcesByType(currentUser.value?.resources!, "campaign")
+    .filter((campaign) => campaign.groupId !== currentGroupId.value);
 });
 
 const resourcesModelCurrentUser = computed(() => {
-  return selectedResourcesStore.getAllResourcesByType(currentUser.value?.resources!, "model");
+  return selectedResourcesStore
+    .getAllResourcesByType(currentUser.value?.resources!, "model")
+    .filter((model) => model.groupId !== currentGroupId.value);
 });
 
 const countResourcesGroupOrUser = computed(() =>
@@ -153,6 +157,10 @@ const classNameSectionResources = {
 };
 
 // methods
+/**
+ *
+ * @param option
+ */
 function setStep(option: Step) {
   step.value = option;
 }
@@ -176,6 +184,7 @@ function isUserSelected(userId: string) {
  */
 function onClickCardGroup(groupId: string) {
   isCardGroupSelected.value = true;
+  isSelectedAll.value = true;
   currentGroupId.value = groupId;
   setStep("users");
 }
@@ -195,7 +204,9 @@ function onClickCardUser(userId: string) {
  */
 function onClickSelectAll() {
   isSelectedAll.value = !isSelectedAll.value;
+  isCardUserSelected.value = false;
   queryUsers.value = "";
+  currentUserId.value = "";
   setStep("resources");
 }
 
@@ -212,7 +223,8 @@ function onSelectUsers(option: Group | User) {
   currentGroupId.value = hasContactSelected ? selectedGroupsStore.groupContactsId : option.uuid;
 
   isCardUserSelected.value = false;
-  isSelectedAll.value = false;
+  isSelectedAll.value = true;
+  isCardGroupSelected.value = true;
 }
 
 /**
@@ -225,6 +237,9 @@ function onSelectResource(option: Campaign | Model) {
     : selectedResourcesStore.addResourceUser(option, currentUserId.value);
 }
 
+/**
+ * @param event
+ */
 function onSearchUsers(event: Event) {
   const target = event.target as HTMLInputElement;
 
@@ -499,49 +514,83 @@ onMounted(async () => {
 
         <div class="w-full h-[1px] bg-gray-200"></div>
 
-        <!-- cards group -->
+        <!-- resources tags -->
         <div class="overflow-auto scroller">
           <!-- if selected all is true group tags -->
-          <div v-if="currentGroup?.resources.length" class="flex flex-col gap-lg">
-            <h3 class="font-200 text-xs underline">{{ currentGroup.name }} resources</h3>
+          <div class="flex flex-col gap-y-xs">
+            <template v-if="isCardGroupSelected">
+              <div v-if="!currentGroup?.resources.length" class="flex flex-col gap-y-xs">
+                <h3 class="font-200 text-xs underline flex gap-x-1 items-center">
+                  <GroupColor :color="currentGroup?.color" size="medium" />
+                  <span>{{ currentGroup?.name }} resources</span>
+                </h3>
+                <p class="text-xs font-200 color-gray">No resources</p>
+              </div>
 
-            <ButtonTagGroup
-              title="Campaigns"
-              :resources="resourcesCampaignCurrentGroup"
-              :id="currentGroup.uuid"
-              @click:chip="selectedResourcesStore.removeResourceGroup"
-            />
+              <div v-else class="flex flex-col gap-lg">
+                <h3 class="font-200 text-xs underline flex gap-x-1">
+                  <GroupColor :color="currentGroup.color" size="small" />
+                  <span>{{ currentGroup.name }} resources</span>
+                </h3>
 
-            <div class="h-[1px] w-full bg-gray-300"></div>
+                <ButtonTagGroup
+                  title="Campaigns"
+                  :resources="resourcesCampaignCurrentGroup"
+                  :id="currentGroup.uuid"
+                  @click:chip="selectedResourcesStore.removeResourceGroup"
+                />
 
-            <ButtonTagGroup
-              title="Models"
-              :resources="resourcesModelCurrentGroup"
-              :id="currentGroup.uuid"
-              @click:chip="selectedResourcesStore.removeResourceGroup"
-            />
-          </div>
+                <ButtonTagGroup
+                  title="Models"
+                  :resources="resourcesModelCurrentGroup"
+                  :id="currentGroup.uuid"
+                  @click:chip="selectedResourcesStore.removeResourceGroup"
+                />
+              </div>
 
-          <!-- user tags -->
+              <div class="h-[1px] w-full bg-gray-300"></div>
+            </template>
 
-          <div v-if="currentUser?.resources.length" class="flex flex-col gap-lg">
-            <h3 class="font-200 text-xs underline">{{ currentUser.first_name }} resources</h3>
+            <!-- user tags -->
+            <template v-if="isCardUserSelected">
+              <div
+                v-if="!resourcesCampaignCurrentUser.length && !resourcesModelCurrentUser.length"
+                class="flex flex-col gap-y-xs"
+              >
+                <h3 class="font-200 text-xs underline flex gap-x-1 items-center">
+                  <span class="w-6 h-6 grid place-items-center">
+                    <img :src="currentUser?.avatar" alt="avatar" class="rounded-full" />
+                  </span>
+                  {{ currentUser?.first_name }} resources
+                </h3>
+                <p class="text-xs font-200 color-gray">No resources</p>
+              </div>
 
-            <ButtonTagGroup
-              title="Campaigns"
-              :resources="resourcesCampaignCurrentUser"
-              :id="currentUser.uuid"
-              @click:chip="selectedResourcesStore.removeResourceUser"
-            />
+              <div v-else class="flex flex-col gap-lg">
+                <h3 class="font-200 text-xs underline flex gap-x-1 items-center">
+                  <span class="w-6 h-6 grid place-items-center">
+                    <img :src="currentUser?.avatar" alt="avatar" class="rounded-full" />
+                  </span>
+                  {{ currentUser?.first_name }} resources
+                </h3>
 
-            <div class="h-[1px] w-full bg-gray-300"></div>
+                <ButtonTagGroup
+                  title="Campaigns"
+                  :resources="resourcesCampaignCurrentUser"
+                  :id="currentUser?.uuid!"
+                  @click:chip="selectedResourcesStore.removeResourceUser"
+                />
 
-            <ButtonTagGroup
-              title="Models"
-              :resources="resourcesModelCurrentUser"
-              :id="currentUser.uuid"
-              @click:chip="selectedResourcesStore.removeResourceUser"
-            />
+                <ButtonTagGroup
+                  title="Models"
+                  :resources="resourcesModelCurrentUser"
+                  :id="currentUser?.uuid!"
+                  @click:chip="selectedResourcesStore.removeResourceUser"
+                />
+              </div>
+
+              <div class="h-[1px] w-full bg-gray-300"></div>
+            </template>
           </div>
         </div>
       </section>

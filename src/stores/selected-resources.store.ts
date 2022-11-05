@@ -51,11 +51,12 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
    */
   function addResourceGroup(resource: Campaign | Model, groupId: string) {
     const group = selectedGroupStore.getGroup(groupId);
+    const newResource = { ...resource, groupId };
 
-    group?.resources.push(resource);
+    group?.resources.push(newResource);
     group?.users.forEach((user) => {
       const current = selectedUserStore.getUser(user.uuid)!;
-      addResourceUser(resource, current?.uuid);
+      addResourceUser(newResource, current?.uuid);
     });
   }
 
