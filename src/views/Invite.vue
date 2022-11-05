@@ -31,6 +31,7 @@ import ChevronDoubleLeftIcon from "../components/icons/ChevronDoubleLeftIcon.vue
 import InputSearch from "../components/InputSearch.vue";
 import ButtonTagGroup from "../components/ButtonTagGroup.vue";
 import SkeletonCardUser from "../components/SkeletonCardUser.vue";
+import Loader from "../components/Loader.vue";
 
 type Step = "groups" | "users" | "resources";
 
@@ -357,6 +358,13 @@ onMounted(async () => {
                 <GroupColor :color="option.color" size="small" />
               </span>
               <span class="text-sm font-extralight">{{ option.label }}</span>
+            </div>
+
+            <div v-if="selectedGroupsStore.isLoading && option.uuid === currentGroupId" class="w-4 h-4">
+              <Loader />
+            </div>
+            <div v-if="option.disabled && !selectedGroupsStore.isLoading">
+              <p class="text-2 font-200 border-1 color-black border-gray px-1 py-0.5 rounded-sm">Selected</p>
             </div>
           </template>
         </MultiSelectFiltered>

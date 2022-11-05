@@ -93,6 +93,7 @@ defineExpose({ current });
       :classes="{
         singleLabelText: 'font-thin text-3 capitalize truncate',
         containerActive: '',
+        // option: 'flex items-center justify-start box-border text-left cursor-pointer text-base ',
       }"
     >
       <template #placeholder>
@@ -112,6 +113,12 @@ defineExpose({ current });
     </MultiSelect>
   </div>
 </template>
+
+<style>
+.multiselect-option {
+  justify-content: space-between;
+}
+</style>
 
 <style scoped>
 .input:checked ~ label {

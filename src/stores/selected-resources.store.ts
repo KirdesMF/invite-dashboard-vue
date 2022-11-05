@@ -17,6 +17,26 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
   const selectedUserStore = useSelectedUsersStore();
 
   /**
+   *
+   * @param resource
+   * @param groupId
+   */
+  function isSelectedResourceGroup(resource: Resource, groupId: string) {
+    const group = selectedGroupStore.getGroup(groupId);
+    return group?.resources.some((r) => r.uuid === resource.uuid);
+  }
+
+  /**
+   *
+   * @param resource
+   * @param userId
+   */
+  function isSelectedResourceUser(resource: Resource, userId: string) {
+    const user = selectedUserStore.getUser(userId);
+    return user?.resources.some((r) => r.uuid === resource.uuid);
+  }
+
+  /**
    * @param resources
    * @param type
    */

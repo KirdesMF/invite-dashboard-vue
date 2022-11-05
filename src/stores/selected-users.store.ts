@@ -46,6 +46,10 @@ export const useSelectedUsersStore = defineStore("selected-user", () => {
   function addUser(user: User, groupId: string, resources?: Array<Resource>) {
     const isSelected = isSelectedUser(user.uuid);
     if (!isSelected) users.value.push({ ...user, groups: [groupId], resources: resources || [] });
+    else {
+      const current = getUser(user.uuid);
+      current?.groups.push(groupId);
+    }
   }
 
   /**

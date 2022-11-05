@@ -16,6 +16,7 @@ export const useGroupsStore = defineStore("groups", () => {
       value: group,
       label: group.name,
       color: group.color,
+      uuid: group.uuid,
       disabled: selectedGroupsStore.isSelectedGroup(group.uuid),
     }))
   );

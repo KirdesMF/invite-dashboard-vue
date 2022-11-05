@@ -1,11 +1,7 @@
 <template>
-  <main class="main grid place-items-center">
-    <div class="w-20 h-20">
-      <svg class="w-full h-full" viewBox="0 0 100 100">
-        <path class="path" d="M 50 0 L 50 100 L 0 50 Z" />
-      </svg>
-    </div>
-  </main>
+  <svg class="w-full h-full overflow-visible" viewBox="0 0 100 100">
+    <circle class="path" cx="50" cy="50" r="50" pathLength="100" />
+  </svg>
 </template>
 
 <style scoped>
@@ -14,11 +10,12 @@
 }
 
 .path {
-  stroke: red;
-  stroke-width: 2px;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: dash 1s linear forwards;
+  stroke: black;
+  fill: none;
+  stroke-width: 10px;
+  stroke-dasharray: 50;
+  animation: rotate 1s linear infinite;
+  transform-origin: 50% 50%;
 }
 
 @keyframes dash {
