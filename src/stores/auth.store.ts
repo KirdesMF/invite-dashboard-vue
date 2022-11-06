@@ -11,10 +11,10 @@ export const useAuthStore = defineStore("auth", () => {
 
   /**
    *
-   * @param licenses
+   * @param count
    */
-  function setLicenses(licenses: number) {
-    auth.value.licenses = licenses;
+  function setLicenses(count: number) {
+    auth.value.licenses = count;
   }
 
   return { countLicenses, isPro, setLicenses };

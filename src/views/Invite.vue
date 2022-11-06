@@ -191,7 +191,7 @@ function onClickCardUser(userId: string) {
  * select all users in group
  */
 function onClickSelectAll() {
-  isSelectedAll.value = !isSelectedAll.value;
+  isSelectedAll.value = true;
   isCardUserSelected.value = false;
   queryUsers.value = "";
   currentStore.setCurrentUserId("");
@@ -233,7 +233,7 @@ function onSearchUsers(event: Event) {
   const target = event.target as HTMLInputElement;
 
   queryUsers.value = target.value;
-  isSelectedAll.value = false;
+  isSelectedAll.value = true;
   isCardUserSelected.value = false;
   currentStore.setCurrentUserId("");
 }
@@ -262,7 +262,7 @@ onMounted(async () => {
   <main class="main">
     <header class="header flex justify-between py-xs px-xl border-b-light border-b-1">
       <div class="flex items-center gap-x-4">
-        <h1 class="font-600 text-lg">Invite managers</h1>
+        <h1 class="font-600 text-sm md:text-lg whitespace-nowrap">Invite managers</h1>
 
         <!-- <div class="h-full w-[1px] bg-gray-300"></div>
 
@@ -294,22 +294,16 @@ onMounted(async () => {
     <div class="grid grid-rows-1 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 overflow-x-hidden">
       <!-- 1  contacts - groups -->
       <section
-        class="border-r-gray-200 border-r-1 bg-white py-sm px-xl flex flex-col gap-y-2xl z-3 transition-transform duration-300 row-[1/-1]"
+        class="border-r-gray-200 border-r-1 bg-white pb-sm px-xl flex flex-col gap-y-lg z-3 transition-transform duration-300 row-[1/-1]"
         :class="classNameSectionGroups[step]"
       >
-        <div class="flex items-center">
-          <p class="font-thin text-sm text-gray-500 max-w-[35ch] mx-auto text-center">
-            Select contacts or a group of contacts
-          </p>
-        </div>
-
         <!-- resume -->
         <div
-          class="flex justify-between items-center py-1 font-extralight text-xs border-t-1 border-t-gray-200 border-b-1 border-b-gray-200"
+          class="flex justify-between items-center py-1 min-h-6 font-extralight text-xs border-b-1 border-b-gray-200"
         >
           <div class="flex gap-x-2 items-center h-full">
             <div class="flex items-center gap-x-0.5">
-              <span class="text-gray-400">
+              <span class="text-gray-400 w-6 h-6">
                 <UserGroup />
               </span>
               <p>{{ selectedGroupsStore.getSelectedGroups.length }}</p>
@@ -357,8 +351,6 @@ onMounted(async () => {
           </template>
         </MultiSelectFiltered>
 
-        <div class="w-full h-[1px] bg-gray-200"></div>
-
         <!-- cards group -->
         <div class="overflow-auto scroller">
           <ul class="flex flex-col gap-y-1">
@@ -377,28 +369,31 @@ onMounted(async () => {
 
       <!-- 2 users -->
       <section
-        class="border-r-gray-200 border-r-1 bg-white py-sm px-xl flex-col gap-y-2xl flex z-2 transition-transform duration-300 row-[1/-1]"
+        class="border-r-gray-200 border-r-1 bg-white pb-sm px-xl flex-col gap-y-lg flex z-2 transition-transform duration-300 row-[1/-1]"
         :class="classNameSectionUsers[step]"
       >
-        <div class="flex items-center">
-          <button
-            v-if="step === 'resources' || step === 'users'"
-            type="button"
-            class="w-5 h-5 text-blue lg:hidden"
-            @click="setStep('groups')"
-          >
-            <ChevronDoubleLeftIcon />
-          </button>
-          <p class="font-thin text-sm text-gray-500 max-w-[35ch] mx-auto text-center">
-            Select a contact or all contacts
-          </p>
-        </div>
-
         <!-- review -->
         <div
-          class="flex justify-between items-center py-1 font-extralight text-xs border-t-1 border-t-gray-200 border-b-1 border-b-gray-200"
+          class="flex justify-between items-center py-1 min-h-8 font-extralight text-xs border-b-1 border-b-gray-200"
         >
           <div class="flex gap-x-2 items-center">
+            <button
+              v-if="step === 'resources' || step === 'users'"
+              type="button"
+              class="w-6 h-6 text-blue lg:hidden"
+              @click="setStep('groups')"
+            >
+              <ChevronDoubleLeftIcon />
+            </button>
+
+            <div v-if="selectedGroupsStore.isLoading" class="w-6 h-6">
+              <Loader />
+            </div>
+            <div v-if="!selectedGroupsStore.isLoading && currentGroup" class="flex items-center gap-x-1">
+              <GroupColor :color="currentGroup.color" size="medium" />
+              <p class="text-xs font-500 text-blue">{{ currentGroup?.name }}</p>
+            </div>
+
             <div class="flex items-center">
               <span class="text-gray-400">
                 <UserIcon />
@@ -411,11 +406,6 @@ onMounted(async () => {
                 <FoldersIcon />
               </span>
               <p>{{ selectedGroupsStore.getCountGroupResources(currentStore.current.groupId) }}</p>
-            </div>
-
-            <div v-if="currentGroup" class="flex items-center gap-x-1">
-              <GroupColor :color="currentGroup.color" size="small" />
-              <p class="text-2.5 font-500 text-blue">{{ currentGroup?.name }}</p>
             </div>
           </div>
 
@@ -433,69 +423,67 @@ onMounted(async () => {
 
         <InputSearch @input="onSearchUsers" />
 
-        <div class="w-full h-[1px] bg-gray-200"></div>
-
         <!-- cards group -->
-        <div class="overflow-auto scroller">
-          <ul class="flex flex-col gap-y-1">
-            <template v-if="selectedGroupsStore.isLoading">
-              <SkeletonCardUser v-for="count in 6" :key="count" :style="{ '--delay': `${count * 75}ms` }" />
-            </template>
 
-            <template v-else>
-              <li v-for="user in filteredGroupUsers" :key="user.uuid">
-                <CardUser
-                  :user="selectedUsersStore.getUser(user.uuid)!"
-                  :resources-count="selectedUsersStore.getCountUserResources(user.uuid) || 0"
-                  :class="{
-                    'bg-gray-200': isUserSelected(user.uuid) || isSelectedAll,
-                  }"
-                  @click="onClickCardUser(user.uuid)"
-                  @delete="selectedGroupsStore.removeUserFromGroup(user.uuid, currentStore.current.groupId)"
-                />
-              </li>
-            </template>
+        <template v-if="selectedGroupsStore.isLoading">
+          <div class="flex flex-col gap-y-1">
+            <SkeletonCardUser v-for="count in 6" :key="count" :style="{ '--delay': `${count * 75}ms` }" />
+          </div>
+        </template>
+        <div v-else class="overflow-auto scroller">
+          <ul class="flex flex-col gap-y-1">
+            <li v-for="user in filteredGroupUsers" :key="user.uuid">
+              <CardUser
+                :user="selectedUsersStore.getUser(user.uuid)!"
+                :resources-count="selectedUsersStore.getCountUserResources(user.uuid) || 0"
+                :class="{
+                  'bg-gray-200': isUserSelected(user.uuid) || isSelectedAll,
+                }"
+                @click="onClickCardUser(user.uuid)"
+                @delete="selectedGroupsStore.removeUserFromGroup(user.uuid, currentStore.current.groupId)"
+              />
+            </li>
           </ul>
         </div>
       </section>
 
       <!-- 3 resume and remove resources -->
       <section
-        class="bg-white py-sm px-xl flex-col gap-y-2xl flex z-1 transition-transform duration-300 row-[1/-1]"
+        class="bg-white pb-sm px-xl flex-col gap-y-lg flex z-1 transition-transform duration-300 row-[1/-1]"
         :class="classNameSectionResources[step]"
       >
-        <div class="flex items-center">
-          <button type="button" class="w-5 h-5 text-blue md:hidden" @click="setStep('users')">
-            <ChevronDoubleLeftIcon />
-          </button>
-          <p class="font-thin text-sm text-gray-500 max-w-[35ch] mx-auto text-center">Manage resources</p>
-        </div>
-
         <!-- resume -->
         <div
-          class="flex justify-between items-center py-1 font-extralight text-xs border-t-1 border-t-gray-200 border-b-1 border-b-gray-200"
+          class="flex justify-between items-center py-1 min-h-8 font-extralight text-xs border-b-1 border-b-gray-200"
         >
           <div class="flex gap-x-2 items-center">
+            <button type="button" class="w-6 h-6 text-blue md:hidden" @click="setStep('users')">
+              <ChevronDoubleLeftIcon />
+            </button>
+
+            <div v-if="selectedGroupsStore.isLoading" class="w-6 h-6">
+              <Loader />
+            </div>
+            <template v-if="!selectedGroupsStore.isLoading && currentGroup">
+              <div v-if="isSelectedAll" class="flex items-center gap-x-1">
+                <GroupColor :color="currentGroup.color" size="medium" />
+                <p class="text-xs font-500 text-blue">{{ currentGroup?.name }}</p>
+              </div>
+
+              <div v-else class="flex items-center gap-x-1">
+                <span class="w-6 h-6 grid place-items-center">
+                  <img :src="currentUser?.avatar" alt="avatar" class="rounded-full" />
+                </span>
+                <p class="text-xs font-500 text-blue">{{ currentUser?.first_name }}</p>
+              </div>
+            </template>
+
             <div class="flex items-center gap-x-0.5">
               <span class="text-gray-400">
                 <FoldersIcon />
               </span>
               <p>{{ countResourcesGroupOrUser }}</p>
             </div>
-
-            <template v-if="currentGroup">
-              <div v-if="isSelectedAll" class="flex items-center gap-x-1">
-                <GroupColor :color="currentGroup.color" size="small" />
-                <p class="text-2.5 font-500 text-blue">{{ currentGroup?.name }}</p>
-              </div>
-
-              <div v-else class="flex items-center gap-x-1">
-                <span class="w-4 h-4 grid place-items-center">
-                  <img :src="currentUser?.avatar" alt="avatar" class="rounded-full" />
-                </span>
-                <p class="text-2.5 font-500 text-blue">{{ currentUser?.first_name }}</p>
-              </div>
-            </template>
           </div>
 
           <div class="flex gap-x-2 items-center">
@@ -508,9 +496,15 @@ onMounted(async () => {
           </div>
         </div>
 
-        <MultiSelectFiltered name="resource-user" :options="resourcesOptions" @select="onSelectResource" />
+        <MultiSelectFiltered name="resource-user" :options="resourcesOptions" @select="onSelectResource">
+          <template #option="{ option }">
+            <span class="text-sm font-extralight">{{ option.label }}</span>
 
-        <div class="w-full h-[1px] bg-gray-200"></div>
+            <div v-if="option.disabled">
+              <p class="text-2 font-200 border-1 color-black border-gray px-1 py-0.5 rounded-sm">Selected</p>
+            </div>
+          </template>
+        </MultiSelectFiltered>
 
         <!-- resources tags -->
         <div class="overflow-auto scroller">
@@ -519,7 +513,7 @@ onMounted(async () => {
             <template v-if="isCardGroupSelected">
               <div v-if="!currentGroup?.resources.length" class="flex flex-col gap-y-xs">
                 <h3 class="font-200 text-xs underline flex gap-x-1 items-center">
-                  <GroupColor :color="currentGroup?.color" size="medium" />
+                  <GroupColor :color="currentGroup?.color" size="small" />
                   <span>{{ currentGroup?.name }} resources</span>
                 </h3>
                 <p class="text-xs font-200 color-gray">No resources</p>
@@ -527,7 +521,7 @@ onMounted(async () => {
 
               <div v-else class="flex flex-col gap-lg">
                 <h3 class="font-200 text-xs underline flex gap-x-1">
-                  <GroupColor :color="currentGroup.color" size="medium" />
+                  <GroupColor :color="currentGroup.color" size="small" />
                   <span>{{ currentGroup.name }} resources</span>
                 </h3>
 
@@ -556,7 +550,7 @@ onMounted(async () => {
                 class="flex flex-col gap-y-xs"
               >
                 <h3 class="font-200 text-xs underline flex gap-x-1 items-center">
-                  <span class="w-6 h-6 grid place-items-center">
+                  <span class="w-4 h-4 grid place-items-center">
                     <img :src="currentUser?.avatar" alt="avatar" class="rounded-full" />
                   </span>
                   {{ currentUser?.first_name }} resources
@@ -566,7 +560,7 @@ onMounted(async () => {
 
               <div v-else class="flex flex-col gap-lg">
                 <h3 class="font-200 text-xs underline flex gap-x-1 items-center">
-                  <span class="w-6 h-6 grid place-items-center">
+                  <span class="w-4 h-4 grid place-items-center">
                     <img :src="currentUser?.avatar" alt="avatar" class="rounded-full" />
                   </span>
                   {{ currentUser?.first_name }} resources
@@ -586,8 +580,6 @@ onMounted(async () => {
                   @click:chip="selectedResourcesStore.removeResourceUser"
                 />
               </div>
-
-              <div class="h-[1px] w-full bg-gray-300"></div>
             </template>
           </div>
         </div>
