@@ -71,8 +71,9 @@ export const useSelectedResourcesStore = defineStore("selected-resources", () =>
    * @param userId
    */
   function removeResourceUser(resource: Campaign | Model, userId: string) {
-    const user = selectedUserStore.getUser(userId)!;
-    user.resources = user?.resources.filter((r) => r.uuid !== resource.uuid);
+    const user = selectedUserStore.getUser(userId);
+
+    if (user) user.resources = user.resources.filter((r) => r.uuid !== resource.uuid);
   }
 
   /**
